@@ -1,0 +1,33 @@
+# AGENTS.md
+
+## 基本约定
+
+- 使用中文交流和编写文档。
+- 修改代码或配置前，先阅读相关上下文，避免凭空改动。
+- 搜索文件和文本时优先使用 `rg`。
+- 不提交密钥、token、缓存、日志、会话记录或机器相关的临时状态。
+- 保持方案简单，先满足当前真实需求，避免过早分层和抽象。
+- 编写脚本时优先使用 Python 标准库；只有出现明确需求时再引入第三方依赖。
+- 新建、初始化或配置项目时，优先使用 `project-conventions` skill 中记录的项目约定；进入已有项目时优先遵循项目现有工具链。
+
+## 行为约束
+
+- 不要主动提交代码或推送变更，等用户确认。
+- 一次提交只做一件事，不把不相关的改动混在一起。
+- Git 提交信息使用英文，并遵循 `git-commit` skill。
+
+## 范围控制与异常处理
+
+- 优先采用满足需求的最小改动，不主动修复任务范围外的问题。
+- 用户未要求依赖管理时，不执行 `add`、`install`、升级依赖或修改 lockfile。
+- 不因“让验证通过”而自行扩大任务范围；任务完成标准以用户明确描述为准。
+
+## Agent skills
+
+### Issue tracker
+
+Issues and specs are tracked in GitHub Issues through the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+This repository uses a single-context domain documentation layout. See `docs/agents/domain.md`.
