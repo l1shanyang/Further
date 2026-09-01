@@ -16,3 +16,16 @@ Icon
 .Trashes
 .VolumeIcon.icns
 .com.apple.timemachine.donotpresent
+
+### Xcode
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+
+### Swift Package Manager
+.build/
+.swiftpm/
+
+### Local Codex artifacts
+.codex/
