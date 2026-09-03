@@ -5,13 +5,15 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 8) {
             Spacer()
 
-            Text(FurtherApp.name)
+            Text(AppText.productName)
                 .font(.system(size: 48, weight: .semibold, design: .rounded))
                 .tracking(-1.5)
+                .accessibilityIdentifier("launch.product-name")
 
-            Text("still going.")
+            Text(AppText.launchTagline)
                 .font(.callout)
                 .foregroundStyle(.secondary)
+                .accessibilityIdentifier("launch.tagline")
 
             Spacer()
         }
@@ -22,6 +24,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        AppComposition.testing().rootView
     }
 }

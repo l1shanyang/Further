@@ -1,0 +1,30 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "app.name" : {
+      "comment" : "The product name shown on the launch page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Further"
+          }
+        }
+      }
+    },
+    "launch.tagline" : {
+      "comment" : "The quiet tagline shown below the product name.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "still going."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
