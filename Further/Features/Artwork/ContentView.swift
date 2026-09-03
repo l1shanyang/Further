@@ -65,6 +65,19 @@ struct AppRootView: View {
                 onCancelEnd: model.cancelRunEnd,
                 onConfirmEnd: { Task { await model.confirmRunEnd() } }
             )
+        case let .reflection(state):
+            ReflectionFlowView(
+                state: state,
+                isCommandInFlight: model.isReflectionCommandInFlight,
+                onSelectColor: model.selectFeelingColor,
+                onChangeNote: model.updateReflectionNote,
+                onFinishExpression: { Task { await model.finishReflectionExpression() } },
+                onKeepSilence: { Task { await model.keepReflectionSilent() } },
+                onChangeDistance: model.updateIndoorDistance,
+                onSaveDistance: { Task { await model.saveIndoorDistance() } },
+                onSkipDistance: { Task { await model.skipIndoorDistance() } },
+                onShowArtwork: model.showUpdatedArtwork
+            )
         case .blocked:
             ContentUnavailableView {
                 Label(AppText.dataUnavailableTitle, systemImage: "externaldrive.badge.exclamationmark")

@@ -154,5 +154,6 @@ struct StoredActivityRecord: Codable, Sendable {
 enum StoredActivityPhase: String, Codable, Sendable {
     case inProgress
     case reflectionDraft
+    case reflectionLocked
     case finalized
 }

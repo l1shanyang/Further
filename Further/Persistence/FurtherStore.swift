@@ -235,17 +235,36 @@ actor FurtherStore {
         }
     }
 
-    @discardableResult
-    func lockReflection(
-        activityID: ActivityID,
-        finalizedAt: Date
-    ) throws -> SharedActivityRecordV1 {
+    func lockExpression(
+        _ draft: ReflectionDraft,
+        activityID: ActivityID
+    ) throws {
         try transaction {
             let activityModel = try requiredActivityModel(id: activityID)
             guard try phase(of: activityModel) == .reflectionDraft else {
                 throw FurtherStoreError.invalidActivityPhase
             }
-            return try lockReflection(activityModel, finalizedAt: finalizedAt)
+            activityModel.reflectionDraftData = try PersistenceCodec.encode(draft)
+            activityModel.phaseRawValue = StoredActivityPhase.reflectionLocked.rawValue
+        }
+    }
+
+    @discardableResult
+    func lockReflection(
+        activityID: ActivityID,
+        manualDistanceMeters: Double? = nil,
+        finalizedAt: Date
+    ) throws -> SharedActivityRecordV1 {
+        try transaction {
+            let activityModel = try requiredActivityModel(id: activityID)
+            guard try phase(of: activityModel) == .reflectionLocked else {
+                throw FurtherStoreError.invalidActivityPhase
+            }
+            return try lockReflection(
+                activityModel,
+                manualDistanceMeters: manualDistanceMeters,
+                finalizedAt: finalizedAt
+            )
         }
     }
 
@@ -283,6 +302,9 @@ actor FurtherStore {
                 case .reflectionDraft:
                     _ = try lockReflection(activityModel, finalizedAt: date)
                     lockedCount += 1
+                case .reflectionLocked:
+                    _ = try lockReflection(activityModel, finalizedAt: date)
+                    lockedCount += 1
                 case .finalized:
                     continue
                 }
@@ -304,14 +326,40 @@ actor FurtherStore {
 
     private func lockReflection(
         _ activityModel: FurtherSchemaV1.ActivityModel,
+        manualDistanceMeters: Double? = nil,
         finalizedAt: Date
     ) throws -> SharedActivityRecordV1 {
         let draft = try reflectionDraft(from: activityModel)
         let stored = try requiredStoredRecord(from: activityModel)
         let routes = try routeSamples(activityID: ActivityID(rawValue: activityModel.id))
-        let record = try stored.domainValue(
+        let storedRecord = try stored.domainValue(
             routeSamples: routes,
             expression: draft.expression
+        )
+        guard manualDistanceMeters == nil || storedRecord.environment == .indoor else {
+            throw FurtherStoreError.invalidActivityPhase
+        }
+        let distance = try manualDistanceMeters.map {
+            try ActivityDistance(meters: $0, source: .manualEntry)
+        }
+        let summary = try ActivitySummary(
+            startedAt: storedRecord.summary.startedAt,
+            endedAt: storedRecord.summary.endedAt,
+            startTimeZoneIdentifier: storedRecord.summary.startTimeZoneIdentifier,
+            activeDuration: storedRecord.summary.activeDuration,
+            pausedDuration: storedRecord.summary.pausedDuration,
+            distance: distance ?? storedRecord.summary.distance
+        )
+        let record = try SharedActivityRecordV1(
+            id: storedRecord.id,
+            artworkID: storedRecord.artworkID,
+            origin: storedRecord.origin,
+            environment: storedRecord.environment,
+            lifecycle: storedRecord.lifecycle,
+            summary: summary,
+            events: storedRecord.events,
+            routeSamples: storedRecord.routeSamples,
+            expression: storedRecord.expression
         )
         try finalize(record, activityModel: activityModel, finalizedAt: finalizedAt)
         return record

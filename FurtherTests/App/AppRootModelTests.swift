@@ -163,9 +163,50 @@ final class AppRootModelTests: XCTestCase {
         await firstFinish.value
         await repeatedFinish.value
 
-        guard case .run(.awaitingReflection) = model.state else {
-            return XCTFail("Expected one successful finish")
+        guard case .reflection(.expression) = model.state else {
+            return XCTFail("Expected one successful transition into reflection")
         }
+    }
+
+    func testIndoorReflectionUpdatesArtworkBeforeReturningHome() async throws {
+        let container = try FurtherModelContainer.inMemory()
+        let source = ModelContainerSource { container }
+        let timeSource = ControlledTimeSource(
+            now: Date(timeIntervalSince1970: 1_810_500_000)
+        )
+        let model = AppRootModel(
+            bootstrap: AppBootstrap(containerSource: source, timeSource: timeSource),
+            timeSource: timeSource,
+            activityOrigin: DomainTestSamples.origin
+        )
+        await model.start()
+        await model.createArtwork(cycle: .milestone(.tenKilometers))
+        model.beginRunPreparation()
+        model.chooseIndoorRun()
+        await model.confirmIndoorRunStart()
+        try await timeSource.advance(by: 3)
+        await model.refreshRunSnapshot()
+        model.requestRunEnd()
+        await model.confirmRunEnd()
+
+        let color = FeelingColorOption.all[1].color
+        model.selectFeelingColor(color)
+        model.updateReflectionNote("clear air")
+        await model.finishReflectionExpression()
+        model.updateIndoorDistance("10")
+        await model.saveIndoorDistance()
+
+        guard case let .reflection(.enteringArtwork(recordColor, artwork)) = model.state else {
+            return XCTFail("Expected causal artwork-entry feedback")
+        }
+        XCTAssertEqual(recordColor, color.value)
+        XCTAssertEqual(artwork.records.count, 1)
+        XCTAssertEqual(artwork.records.first?.expression.note, "clear air")
+        XCTAssertEqual(artwork.presentation.marks.count, 1)
+        XCTAssertEqual(artwork.presentation.phase, .completed)
+
+        model.showUpdatedArtwork()
+        XCTAssertEqual(model.state, .currentArtwork(artwork))
     }
 }
 

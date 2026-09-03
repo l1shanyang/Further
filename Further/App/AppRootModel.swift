@@ -18,6 +18,7 @@ enum AppRootState: Equatable, Sendable {
     case cycleSelection(isCreating: Bool)
     case currentArtwork(CurrentArtworkViewState)
     case run(RunFlowViewState)
+    case reflection(ReflectionFlowViewState)
     case blocked
 }
 
@@ -27,6 +28,7 @@ final class AppRootModel {
     private(set) var state: AppRootState = .loading
     private(set) var recoveryNotice: AppBootstrapNotice?
     private(set) var isRunCommandInFlight = false
+    private(set) var isReflectionCommandInFlight = false
 
     private let bootstrap: AppBootstrap
     private let timeSource: any TimeSource
@@ -36,6 +38,7 @@ final class AppRootModel {
     private var artworkBeforeRun: CurrentArtworkViewState?
     private var recorder: RunRecorder?
     private var runUpdateTask: Task<Void, Never>?
+    private var reflectionDraftSaveTask: Task<Void, Never>?
 
     init(
         bootstrap: AppBootstrap,
@@ -210,7 +213,16 @@ final class AppRootModel {
         do {
             let record = try await recorder.finish()
             guard state == expectedState else { return }
-            state = .run(.awaitingReflection(activityID: record.id))
+            guard case let .silence(color, note) = record.expression else {
+                state = .blocked
+                return
+            }
+            state = .reflection(.expression(ReflectionExpressionState(
+                activityID: record.id,
+                silenceColor: color,
+                feelingColor: nil,
+                note: note ?? ""
+            )))
         } catch {
             if state == expectedState {
                 state = .blocked
@@ -260,6 +272,59 @@ final class AppRootModel {
         }
     }
 
+    func selectFeelingColor(_ color: FeelingColor) {
+        updateReflectionExpression { expression in
+            expression.feelingColor = color
+        }
+    }
+
+    func updateReflectionNote(_ note: String) {
+        updateReflectionExpression { expression in
+            expression.note = note
+        }
+    }
+
+    func finishReflectionExpression() async {
+        await finishReflectionExpression(keepingSilence: false)
+    }
+
+    func keepReflectionSilent() async {
+        await finishReflectionExpression(keepingSilence: true)
+    }
+
+    func updateIndoorDistance(_ kilometers: String) {
+        guard case var .reflection(.indoorDistance(distance)) = state,
+              !isReflectionCommandInFlight else { return }
+        distance.kilometers = kilometers
+        distance.showsValidationError = false
+        state = .reflection(.indoorDistance(distance))
+    }
+
+    func saveIndoorDistance() async {
+        guard case var .reflection(.indoorDistance(distance)) = state,
+              !isReflectionCommandInFlight else { return }
+        guard let meters = ManualDistanceParser.meters(fromKilometers: distance.kilometers) else {
+            distance.showsValidationError = true
+            state = .reflection(.indoorDistance(distance))
+            return
+        }
+        await finalizeReflection(activityID: distance.activityID, manualDistanceMeters: meters)
+    }
+
+    func skipIndoorDistance() async {
+        guard case let .reflection(.indoorDistance(distance)) = state,
+              !isReflectionCommandInFlight else { return }
+        await finalizeReflection(activityID: distance.activityID, manualDistanceMeters: nil)
+    }
+
+    func showUpdatedArtwork() {
+        guard case let .reflection(.enteringArtwork(_, artwork)) = state else { return }
+        state = .currentArtwork(artwork)
+        artworkBeforeRun = nil
+        recorder = nil
+        reflectionDraftSaveTask = nil
+    }
+
     func dismissRecoveryNotice() {
         recoveryNotice = nil
     }
@@ -295,6 +360,113 @@ final class AppRootModel {
             state = .run(.tracking(.paused(activeDuration: snapshot.activeDuration)))
         case .finished:
             break
+        }
+    }
+
+    private func updateReflectionExpression(
+        _ update: (inout ReflectionExpressionState) -> Void
+    ) {
+        guard case var .reflection(.expression(expression)) = state,
+              !isReflectionCommandInFlight,
+              let store else { return }
+        update(&expression)
+
+        do {
+            let draft = try expression.draft
+            state = .reflection(.expression(expression))
+            enqueueReflectionDraftSave(
+                draft,
+                activityID: expression.activityID,
+                store: store
+            )
+        } catch {
+            state = .blocked
+        }
+    }
+
+    private func enqueueReflectionDraftSave(
+        _ draft: ReflectionDraft,
+        activityID: ActivityID,
+        store: FurtherStore
+    ) {
+        let previous = reflectionDraftSaveTask
+        reflectionDraftSaveTask = Task { [weak self] in
+            await previous?.value
+            do {
+                try await store.saveReflectionDraft(draft, activityID: activityID)
+            } catch {
+                guard let self,
+                      case let .reflection(.expression(current)) = self.state,
+                      current.activityID == activityID else { return }
+                self.state = .blocked
+            }
+        }
+    }
+
+    private func finishReflectionExpression(keepingSilence: Bool) async {
+        guard case var .reflection(.expression(expression)) = state,
+              !isReflectionCommandInFlight,
+              let store else { return }
+        isReflectionCommandInFlight = true
+        defer { isReflectionCommandInFlight = false }
+
+        if keepingSilence {
+            expression.feelingColor = nil
+            do {
+                let draft = try expression.draft
+                state = .reflection(.expression(expression))
+                enqueueReflectionDraftSave(
+                    draft,
+                    activityID: expression.activityID,
+                    store: store
+                )
+            } catch {
+                state = .blocked
+                return
+            }
+        }
+
+        await reflectionDraftSaveTask?.value
+        guard case let .reflection(.expression(current)) = state,
+              current.activityID == expression.activityID else { return }
+        do {
+            try await store.lockExpression(current.draft, activityID: current.activityID)
+            state = .reflection(.indoorDistance(IndoorDistanceState(
+                activityID: current.activityID,
+                kilometers: "",
+                showsValidationError: false
+            )))
+        } catch {
+            state = .blocked
+        }
+    }
+
+    private func finalizeReflection(
+        activityID: ActivityID,
+        manualDistanceMeters: Double?
+    ) async {
+        guard !isReflectionCommandInFlight, let store else { return }
+        isReflectionCommandInFlight = true
+        defer { isReflectionCommandInFlight = false }
+
+        do {
+            let record = try await store.lockReflection(
+                activityID: activityID,
+                manualDistanceMeters: manualDistanceMeters,
+                finalizedAt: await timeSource.now()
+            )
+            guard let artwork = try await store.currentArtwork(),
+                  artwork.id == record.artworkID else {
+                state = .blocked
+                return
+            }
+            let records = try await store.records(for: artwork.id)
+            state = .reflection(.enteringArtwork(
+                recordColor: record.expression.recordColor,
+                artwork: CurrentArtworkViewState(artwork: artwork, records: records)
+            ))
+        } catch {
+            state = .blocked
         }
     }
 

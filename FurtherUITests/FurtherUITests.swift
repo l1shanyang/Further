@@ -44,4 +44,31 @@ final class FurtherUITests: XCTestCase {
         app.buttons["run.keep-running"].tap()
         XCTAssertTrue(app.buttons["run.resume"].waitForExistence(timeout: 2))
     }
+
+    func testIndoorRunReflectionEntersArtwork() {
+        let app = XCUIApplication()
+        app.launchArguments.append("-ui-testing")
+        app.launch()
+
+        XCTAssertTrue(app.scrollViews["cycle.selection"].waitForExistence(timeout: 5))
+        app.buttons["cycle.confirm"].tap()
+        XCTAssertTrue(app.buttons["artwork.prepare-run"].waitForExistence(timeout: 5))
+        app.buttons["artwork.prepare-run"].tap()
+        app.buttons["run.choose-indoor"].tap()
+        app.buttons["run.start"].tap()
+        XCTAssertTrue(app.buttons["run.end"].waitForExistence(timeout: 6))
+        app.buttons["run.end"].tap()
+        app.buttons["run.confirm-end"].tap()
+
+        XCTAssertTrue(app.scrollViews["reflection.expression"].waitForExistence(timeout: 3))
+        app.buttons["reflection.color.2"].tap()
+        app.buttons["reflection.finish"].tap()
+        XCTAssertTrue(app.buttons["reflection.skip-distance"].waitForExistence(timeout: 3))
+        app.buttons["reflection.skip-distance"].tap()
+
+        XCTAssertTrue(app.buttons["reflection.view-artwork"].waitForExistence(timeout: 3))
+        app.buttons["reflection.view-artwork"].tap()
+        XCTAssertTrue(app.scrollViews["artwork.current"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Your current artwork"].exists)
+    }
 }

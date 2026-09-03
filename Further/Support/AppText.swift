@@ -233,4 +233,106 @@ enum AppText {
         defaultValue: "Your run facts and silent expression are ready for reflection.",
         comment: "Explains the handoff from tracking to reflection."
     )
+    static let howDidItFeel = String(
+        localized: "reflection.expression.title",
+        defaultValue: "How did it feel?",
+        comment: "Title for the post-run feeling reflection."
+    )
+    static let chooseFeelingColor = String(
+        localized: "reflection.expression.message",
+        defaultValue: "Choose a color, add a short note, or keep this run silent.",
+        comment: "Explanation for the reflection choices."
+    )
+    static let shortNote = String(
+        localized: "reflection.note.title",
+        defaultValue: "Short note",
+        comment: "Label for the optional reflection note."
+    )
+    static let shortNotePlaceholder = String(
+        localized: "reflection.note.placeholder",
+        defaultValue: "A detail you want to remember",
+        comment: "Placeholder for the optional reflection note."
+    )
+    static let finishExpression = String(
+        localized: "reflection.expression.finish",
+        defaultValue: "Finish expression",
+        comment: "Locks the current color and note selection."
+    )
+    static let keepSilence = String(
+        localized: "reflection.expression.silence",
+        defaultValue: "Keep this run silent",
+        comment: "Completes reflection with a silence expression."
+    )
+    static let addIndoorDistance = String(
+        localized: "reflection.distance.title",
+        defaultValue: "Add indoor distance?",
+        comment: "Title for optional indoor manual distance entry."
+    )
+    static let indoorDistanceMessage = String(
+        localized: "reflection.distance.message",
+        defaultValue: "Enter the distance shown by your treadmill or indoor equipment.",
+        comment: "Explanation for manual indoor distance."
+    )
+    static let distancePlaceholder = String(
+        localized: "reflection.distance.placeholder",
+        defaultValue: "5.00",
+        comment: "Example value for indoor distance input."
+    )
+    static let kilometers = String(
+        localized: "unit.kilometers",
+        defaultValue: "km",
+        comment: "Abbreviated kilometer unit."
+    )
+    static let validDistanceRequired = String(
+        localized: "reflection.distance.invalid",
+        defaultValue: "Enter a distance greater than zero.",
+        comment: "Validation message for manual indoor distance."
+    )
+    static let saveDistance = String(
+        localized: "reflection.distance.save",
+        defaultValue: "Save distance",
+        comment: "Saves the manual indoor distance and completes the record."
+    )
+    static let skipDistance = String(
+        localized: "reflection.distance.skip",
+        defaultValue: "Skip distance",
+        comment: "Completes an indoor record while leaving distance unknown."
+    )
+    static let recordJoinedArtwork = String(
+        localized: "reflection.artwork.title",
+        defaultValue: "This run is now part of your artwork.",
+        comment: "Causal feedback after the finalized record enters its artwork."
+    )
+    static let artworkCompletedByRun = String(
+        localized: "reflection.artwork.completed",
+        defaultValue: "This mark completed the artwork.",
+        comment: "Feedback when the newly added record completes the artwork."
+    )
+    static let viewArtwork = String(
+        localized: "reflection.artwork.view",
+        defaultValue: "View artwork",
+        comment: "Leaves record-entry feedback for the current artwork."
+    )
+
+    static func feelingColor(_ number: Int) -> String {
+        String.localizedStringWithFormat(
+            String(
+                localized: "reflection.color.accessibility",
+                defaultValue: "Feeling color %lld",
+                comment: "Neutral numbered accessibility label for an unlabeled feeling color."
+            ),
+            number
+        )
+    }
+
+    static func artworkNowHasMarks(_ count: Int) -> String {
+        String.localizedStringWithFormat(
+            String(
+                localized: "reflection.artwork.mark-count",
+                defaultValue: "Your artwork now holds %lld marks.",
+                comment: "Record-entry feedback with the current number of artwork marks."
+            ),
+            count
+        )
+    }
 }

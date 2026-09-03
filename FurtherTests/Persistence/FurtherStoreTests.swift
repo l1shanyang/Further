@@ -41,6 +41,7 @@ final class FurtherStoreTests: XCTestCase {
         let draft = try ReflectionDraft(expression: record.expression)
 
         try await store.beginReflection(record: record, draft: draft)
+        try await store.lockExpression(draft, activityID: assignment.activityID)
         let locked = try await store.lockReflection(
             activityID: assignment.activityID,
             finalizedAt: record.summary.endedAt
@@ -123,6 +124,147 @@ final class FurtherStoreTests: XCTestCase {
 
         XCTAssertEqual(recovery.lockedReflectionCount, 1)
         XCTAssertEqual(restored?.expression, feeling)
+        XCTAssertNil(recovery.currentArtwork?.pendingActivityID)
+    }
+
+    func testManualDistanceAndExpressionLockAtomicallyEnterArtwork() async throws {
+        let store = try makeStore()
+        _ = try await store.createCurrentArtwork(cycle: .milestone(.tenKilometers))
+        let startedAt = Date(timeIntervalSince1970: 1_800_300_000)
+        let assignment = try await startActivity(in: store, at: startedAt)
+        let endedAt = startedAt.addingTimeInterval(60)
+        let record = try DomainTestSamples.record(assignment: assignment, endedAt: endedAt)
+        try await store.beginReflection(
+            record: record,
+            draft: ReflectionDraft(expression: record.expression)
+        )
+        let feeling = RecordExpression.feeling(
+            color: FeelingColorOption.all[2].color,
+            note: "finished strong"
+        )
+        let feelingDraft = try ReflectionDraft(expression: feeling)
+        try await store.saveReflectionDraft(
+            feelingDraft,
+            activityID: assignment.activityID
+        )
+        try await store.lockExpression(feelingDraft, activityID: assignment.activityID)
+
+        do {
+            try await store.saveReflectionDraft(
+                ReflectionDraft(expression: try DomainTestSamples.silenceExpression()),
+                activityID: assignment.activityID
+            )
+            XCTFail("Expected expression edits to be rejected immediately after locking")
+        } catch {
+            XCTAssertEqual(error as? FurtherStoreError, .invalidActivityPhase)
+        }
+
+        let locked = try await store.lockReflection(
+            activityID: assignment.activityID,
+            manualDistanceMeters: 10_000,
+            finalizedAt: endedAt
+        )
+
+        XCTAssertEqual(locked.expression, feeling)
+        XCTAssertEqual(locked.summary.distance?.meters, 10_000)
+        XCTAssertEqual(locked.summary.distance?.source, .manualEntry)
+        guard let completedArtwork = try await store.currentArtwork(),
+              case .completed = completedArtwork.state else {
+            return XCTFail("Expected the manual distance to complete the milestone artwork")
+        }
+
+    }
+
+    func testSkippingIndoorDistanceKeepsDistanceUnknown() async throws {
+        let store = try makeStore()
+        _ = try await store.createCurrentArtwork(cycle: .milestone(.tenKilometers))
+        let startedAt = Date(timeIntervalSince1970: 1_800_400_000)
+        let assignment = try await startActivity(in: store, at: startedAt)
+        let endedAt = startedAt.addingTimeInterval(60)
+        let record = try DomainTestSamples.record(assignment: assignment, endedAt: endedAt)
+        try await store.beginReflection(
+            record: record,
+            draft: ReflectionDraft(expression: record.expression)
+        )
+        try await store.lockExpression(
+            ReflectionDraft(expression: record.expression),
+            activityID: assignment.activityID
+        )
+
+        let locked = try await store.lockReflection(
+            activityID: assignment.activityID,
+            finalizedAt: endedAt
+        )
+
+        XCTAssertNil(locked.summary.distance)
+        guard let accumulatingArtwork = try await store.currentArtwork(),
+              case .accumulating = accumulatingArtwork.state else {
+            return XCTFail("Expected an unknown distance not to complete the milestone")
+        }
+    }
+
+    func testLastSavedDraftCanReturnFromFeelingToSilence() async throws {
+        let store = try makeStore()
+        _ = try await store.createCurrentArtwork(cycle: .time(.oneMonth))
+        let startedAt = Date(timeIntervalSince1970: 1_800_500_000)
+        let assignment = try await startActivity(in: store, at: startedAt)
+        let endedAt = startedAt.addingTimeInterval(60)
+        let record = try DomainTestSamples.record(assignment: assignment, endedAt: endedAt)
+        try await store.beginReflection(
+            record: record,
+            draft: ReflectionDraft(expression: record.expression)
+        )
+        try await store.saveReflectionDraft(
+            ReflectionDraft(expression: .feeling(
+                color: FeelingColorOption.all[0].color,
+                note: "first choice"
+            )),
+            activityID: assignment.activityID
+        )
+        let silence = try DomainTestSamples.silenceExpression(note: "quiet instead")
+        try await store.saveReflectionDraft(
+            ReflectionDraft(expression: silence),
+            activityID: assignment.activityID
+        )
+        try await store.lockExpression(
+            ReflectionDraft(expression: silence),
+            activityID: assignment.activityID
+        )
+
+        let locked = try await store.lockReflection(
+            activityID: assignment.activityID,
+            finalizedAt: endedAt
+        )
+
+        XCTAssertEqual(locked.expression, silence)
+    }
+
+    func testBootstrapFinalizesLockedExpressionWithoutIndoorDistance() async throws {
+        let store = try makeStore()
+        _ = try await store.createCurrentArtwork(cycle: .milestone(.tenKilometers))
+        let startedAt = Date(timeIntervalSince1970: 1_800_600_000)
+        let assignment = try await startActivity(in: store, at: startedAt)
+        let endedAt = startedAt.addingTimeInterval(60)
+        let record = try DomainTestSamples.record(assignment: assignment, endedAt: endedAt)
+        let expression = RecordExpression.feeling(
+            color: FeelingColorOption.all[3].color,
+            note: "locked before distance"
+        )
+        try await store.beginReflection(
+            record: record,
+            draft: ReflectionDraft(expression: record.expression)
+        )
+        try await store.lockExpression(
+            ReflectionDraft(expression: expression),
+            activityID: assignment.activityID
+        )
+
+        let recovery = try await store.recoverForBootstrap(at: endedAt.addingTimeInterval(5))
+        let recovered = try await store.activityRecord(id: assignment.activityID)
+
+        XCTAssertEqual(recovery.lockedReflectionCount, 1)
+        XCTAssertEqual(recovered?.expression, expression)
+        XCTAssertNil(recovered?.summary.distance)
         XCTAssertNil(recovery.currentArtwork?.pendingActivityID)
     }
 
