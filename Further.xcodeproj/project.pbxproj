@@ -26,6 +26,15 @@
 		D1000000000000000000000A /* ArtworkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2000000000000000000000A /* ArtworkTests.swift */; };
 		D1000000000000000000000B /* SharedActivityRecordTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2000000000000000000000B /* SharedActivityRecordTests.swift */; };
 		D1000000000000000000000C /* TimeSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2000000000000000000000C /* TimeSourceTests.swift */; };
+		E10000000000000000000001 /* ActivityCheckpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000001 /* ActivityCheckpoint.swift */; };
+		E10000000000000000000002 /* ReflectionDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000002 /* ReflectionDraft.swift */; };
+		E10000000000000000000003 /* PersistenceSchemaV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000003 /* PersistenceSchemaV1.swift */; };
+		E10000000000000000000004 /* FurtherModelContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000004 /* FurtherModelContainer.swift */; };
+		E10000000000000000000005 /* PersistenceMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000005 /* PersistenceMapper.swift */; };
+		E10000000000000000000006 /* FurtherStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000006 /* FurtherStore.swift */; };
+		E10000000000000000000007 /* AppBootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000007 /* AppBootstrap.swift */; };
+		E10000000000000000000008 /* FurtherStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000008 /* FurtherStoreTests.swift */; };
+		E10000000000000000000009 /* AppBootstrapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000009 /* AppBootstrapTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,6 +77,15 @@
 		D2000000000000000000000A /* ArtworkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkTests.swift; sourceTree = "<group>"; };
 		D2000000000000000000000B /* SharedActivityRecordTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedActivityRecordTests.swift; sourceTree = "<group>"; };
 		D2000000000000000000000C /* TimeSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeSourceTests.swift; sourceTree = "<group>"; };
+		E20000000000000000000001 /* ActivityCheckpoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityCheckpoint.swift; sourceTree = "<group>"; };
+		E20000000000000000000002 /* ReflectionDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReflectionDraft.swift; sourceTree = "<group>"; };
+		E20000000000000000000003 /* PersistenceSchemaV1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceSchemaV1.swift; sourceTree = "<group>"; };
+		E20000000000000000000004 /* FurtherModelContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FurtherModelContainer.swift; sourceTree = "<group>"; };
+		E20000000000000000000005 /* PersistenceMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceMapper.swift; sourceTree = "<group>"; };
+		E20000000000000000000006 /* FurtherStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FurtherStore.swift; sourceTree = "<group>"; };
+		E20000000000000000000007 /* AppBootstrap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBootstrap.swift; sourceTree = "<group>"; };
+		E20000000000000000000008 /* FurtherStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FurtherStoreTests.swift; sourceTree = "<group>"; };
+		E20000000000000000000009 /* AppBootstrapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBootstrapTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,7 +142,9 @@
 			isa = PBXGroup;
 			children = (
 				A20000000000000000000003 /* FurtherTests.swift */,
+				E70000000000000000000001 /* App */,
 				D70000000000000000000001 /* Domain */,
+				E70000000000000000000002 /* Persistence */,
 			);
 			path = FurtherTests;
 			sourceTree = "<group>";
@@ -144,6 +164,7 @@
 			children = (
 				A20000000000000000000001 /* FurtherApp.swift */,
 				B20000000000000000000001 /* AppComposition.swift */,
+				E20000000000000000000007 /* AppBootstrap.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -158,6 +179,8 @@
 				D20000000000000000000005 /* SharedActivityRecord.swift */,
 				D20000000000000000000006 /* Artwork.swift */,
 				D20000000000000000000007 /* TimeSource.swift */,
+				E20000000000000000000001 /* ActivityCheckpoint.swift */,
+				E20000000000000000000002 /* ReflectionDraft.swift */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -165,6 +188,10 @@
 		B70000000000000000000003 /* Persistence */ = {
 			isa = PBXGroup;
 			children = (
+				E20000000000000000000003 /* PersistenceSchemaV1.swift */,
+				E20000000000000000000004 /* FurtherModelContainer.swift */,
+				E20000000000000000000005 /* PersistenceMapper.swift */,
+				E20000000000000000000006 /* FurtherStore.swift */,
 			);
 			path = Persistence;
 			sourceTree = "<group>";
@@ -281,6 +308,22 @@
 				D2000000000000000000000C /* TimeSourceTests.swift */,
 			);
 			path = Domain;
+			sourceTree = "<group>";
+		};
+		E70000000000000000000001 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				E20000000000000000000009 /* AppBootstrapTests.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		E70000000000000000000002 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				E20000000000000000000008 /* FurtherStoreTests.swift */,
+			);
+			path = Persistence;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -430,6 +473,13 @@
 				D10000000000000000000005 /* SharedActivityRecord.swift in Sources */,
 				D10000000000000000000006 /* Artwork.swift in Sources */,
 				D10000000000000000000007 /* TimeSource.swift in Sources */,
+				E10000000000000000000001 /* ActivityCheckpoint.swift in Sources */,
+				E10000000000000000000002 /* ReflectionDraft.swift in Sources */,
+				E10000000000000000000003 /* PersistenceSchemaV1.swift in Sources */,
+				E10000000000000000000004 /* FurtherModelContainer.swift in Sources */,
+				E10000000000000000000005 /* PersistenceMapper.swift in Sources */,
+				E10000000000000000000006 /* FurtherStore.swift in Sources */,
+				E10000000000000000000007 /* AppBootstrap.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -443,6 +493,8 @@
 				D1000000000000000000000A /* ArtworkTests.swift in Sources */,
 				D1000000000000000000000B /* SharedActivityRecordTests.swift in Sources */,
 				D1000000000000000000000C /* TimeSourceTests.swift in Sources */,
+				E10000000000000000000008 /* FurtherStoreTests.swift in Sources */,
+				E10000000000000000000009 /* AppBootstrapTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

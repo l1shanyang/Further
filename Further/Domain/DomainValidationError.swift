@@ -16,4 +16,5 @@ enum DomainValidationError: Error, Equatable {
     case activityNotAssigned
     case activityAlreadyFinalized
     case activityBelongsToAnotherArtwork
+    case invalidArtworkState
 }

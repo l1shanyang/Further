@@ -61,7 +61,7 @@ enum ArtworkState: Codable, Equatable, Sendable {
     case archived(period: ArtworkPeriod, completedAt: Date, archivedAt: Date)
 }
 
-struct ActivityAssignment: Equatable, Sendable {
+struct ActivityAssignment: Codable, Equatable, Sendable {
     let activityID: ActivityID
     let artworkID: ArtworkID
     let environment: RunningEnvironment
@@ -82,6 +82,76 @@ struct Artwork: Codable, Equatable, Sendable {
         state = .blank
         activityIDs = []
         pendingActivityID = nil
+    }
+
+    init(
+        id: ArtworkID,
+        cycle: ArtworkCycle,
+        state: ArtworkState,
+        activityIDs: [ActivityID],
+        pendingActivityID: ActivityID?
+    ) throws {
+        self.id = id
+        self.cycle = cycle
+        self.state = state
+        self.activityIDs = activityIDs
+        self.pendingActivityID = pendingActivityID
+        try validate()
+    }
+
+    func validate() throws {
+        guard Set(activityIDs).count == activityIDs.count else {
+            throw DomainValidationError.invalidArtworkState
+        }
+        if let pendingActivityID, !activityIDs.contains(pendingActivityID) {
+            throw DomainValidationError.invalidArtworkState
+        }
+
+        let period: ArtworkPeriod?
+        switch state {
+        case .blank:
+            guard activityIDs.isEmpty, pendingActivityID == nil else {
+                throw DomainValidationError.invalidArtworkState
+            }
+            period = nil
+        case let .accumulating(value):
+            guard !activityIDs.isEmpty else {
+                throw DomainValidationError.invalidArtworkState
+            }
+            period = value
+        case let .completed(value, completedAt):
+            guard !activityIDs.isEmpty,
+                  pendingActivityID == nil,
+                  completedAt >= value.startedAt else {
+                throw DomainValidationError.invalidArtworkState
+            }
+            period = value
+        case let .archived(value, completedAt, archivedAt):
+            guard !activityIDs.isEmpty,
+                  pendingActivityID == nil,
+                  completedAt >= value.startedAt,
+                  archivedAt >= completedAt else {
+                throw DomainValidationError.invalidArtworkState
+            }
+            period = value
+        }
+
+        guard let period else { return }
+        guard TimeZone(identifier: period.startTimeZoneIdentifier) != nil,
+              period.endsAt.map({ $0 >= period.startedAt }) ?? true else {
+            throw DomainValidationError.invalidArtworkState
+        }
+
+        switch cycle {
+        case .time:
+            guard period.endsAt != nil else {
+                throw DomainValidationError.invalidArtworkState
+            }
+        case .milestone:
+            guard period.endsAt == nil else {
+                throw DomainValidationError.invalidArtworkState
+            }
+        }
     }
 
     mutating func beginActivity(

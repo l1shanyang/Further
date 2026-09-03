@@ -1,6 +1,6 @@
 # Further 实施计划
 
-> 状态：实施中；阶段 0 已完成，阶段 1 已通过验收并等待提交
+> 状态：实施中；阶段 0、阶段 1 和阶段 2 已完成并提交
 
 ## 目的
 
@@ -33,7 +33,7 @@ Xcode target、Swift module、App 生命周期、组合入口，以及单元测�
 
 ## 阶段 1：纯领域模型
 
-> 状态：已完成实现与验收，等待提交
+> 状态：已完成并提交
 
 ### 范围
 
@@ -54,6 +54,8 @@ Xcode target、Swift module、App 生命周期、组合入口，以及单元测�
 Swift `struct`、`enum`、值语义、protocol、`Codable` 和单元测试。
 
 ## 阶段 2：SwiftData 与 FurtherStore
+
+> 状态：已完成并提交
 
 ### 范围
 
