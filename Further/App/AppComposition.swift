@@ -41,7 +41,19 @@ struct AppComposition {
     var rootView: some View {
         AppRootView(model: AppRootModel(
             bootstrap: bootstrap,
-            timeSource: timeSource
+            timeSource: timeSource,
+            activityOrigin: activityOrigin
         ))
+    }
+
+    private var activityOrigin: ActivityOrigin {
+        let bundle = Bundle.main
+        return ActivityOrigin(
+            productIdentifier: bundle.bundleIdentifier ?? "Further",
+            productVersion: bundle.object(forInfoDictionaryKey: "CFBundleShortVersionString")
+                as? String ?? "unknown",
+            deviceModel: nil,
+            operatingSystemVersion: ProcessInfo.processInfo.operatingSystemVersionString
+        )
     }
 }

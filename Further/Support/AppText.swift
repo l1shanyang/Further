@@ -128,4 +128,109 @@ enum AppText {
         defaultValue: "Your last saved expression was added to the artwork.",
         comment: "Message after a reflection draft is finalized on startup."
     )
+    static let prepareRun = String(
+        localized: "run.prepare",
+        defaultValue: "Prepare to run",
+        comment: "Primary action on the current artwork."
+    )
+    static let chooseRunEnvironment = String(
+        localized: "run.environment.title",
+        defaultValue: "Where will you run?",
+        comment: "Title on the running environment selection page."
+    )
+    static let indoorRunMessage = String(
+        localized: "run.environment.indoor.message",
+        defaultValue: "Indoor running works without location or route tracking.",
+        comment: "Explanation for the indoor running path."
+    )
+    static let indoorRun = String(
+        localized: "run.environment.indoor",
+        defaultValue: "Indoor run",
+        comment: "Indoor running environment option."
+    )
+    static let cancel = String(
+        localized: "action.cancel",
+        defaultValue: "Cancel",
+        comment: "Generic cancel action."
+    )
+    static let readyToRun = String(
+        localized: "run.ready.title",
+        defaultValue: "Ready to run?",
+        comment: "Title before the final start action."
+    )
+    static let startRunPromise = String(
+        localized: "run.ready.message",
+        defaultValue: "Starting creates this run immediately, then begins the countdown.",
+        comment: "Explains the start-is-a-record product promise."
+    )
+    static let startRun = String(
+        localized: "run.start",
+        defaultValue: "Start run",
+        comment: "Final action that creates the running session."
+    )
+    static let runHasStarted = String(
+        localized: "run.countdown.message",
+        defaultValue: "Your run has started.",
+        comment: "Message shown during the non-cancellable countdown."
+    )
+    static let runInProgress = String(
+        localized: "run.tracking.active",
+        defaultValue: "Running",
+        comment: "Active running state label."
+    )
+    static let runPaused = String(
+        localized: "run.tracking.paused",
+        defaultValue: "Paused",
+        comment: "Paused running state label."
+    )
+    static let distance = String(
+        localized: "run.distance",
+        defaultValue: "Distance",
+        comment: "Distance label on the run tracking page."
+    )
+    static let notRecorded = String(
+        localized: "run.distance.not-recorded",
+        defaultValue: "Not recorded",
+        comment: "Displayed when distance is unknown."
+    )
+    static let pauseRun = String(
+        localized: "run.pause",
+        defaultValue: "Pause",
+        comment: "Pause the current run."
+    )
+    static let resumeRun = String(
+        localized: "run.resume",
+        defaultValue: "Resume",
+        comment: "Resume the paused run."
+    )
+    static let endRun = String(
+        localized: "run.end",
+        defaultValue: "End run",
+        comment: "End the current run."
+    )
+    static let keepRunning = String(
+        localized: "run.end.keep",
+        defaultValue: "Keep running",
+        comment: "Cancel ending and return to the prior run state."
+    )
+    static let endRunTitle = String(
+        localized: "run.end.title",
+        defaultValue: "End this run?",
+        comment: "Title for the explicit end confirmation."
+    )
+    static let endRunMessage = String(
+        localized: "run.end.message",
+        defaultValue: "The reliable details so far will be saved.",
+        comment: "Message for the explicit end confirmation."
+    )
+    static let runSaved = String(
+        localized: "run.saved.title",
+        defaultValue: "Run saved",
+        comment: "Stage boundary shown after normal ending."
+    )
+    static let runSavedMessage = String(
+        localized: "run.saved.message",
+        defaultValue: "Your run facts and silent expression are ready for reflection.",
+        comment: "Explains the handoff from tracking to reflection."
+    )
 }

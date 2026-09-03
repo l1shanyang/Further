@@ -176,6 +176,52 @@ actor FurtherStore {
         }
     }
 
+    func endActivity(
+        checkpoint: ActivityCheckpoint,
+        record: SharedActivityRecordV1,
+        draft: ReflectionDraft
+    ) throws {
+        try transaction {
+            try checkpoint.validate()
+            try record.validate()
+            guard record.lifecycle.isNormalEnd else {
+                throw FurtherStoreError.invalidActivityPhase
+            }
+
+            let activityModel = try requiredActivityModel(id: record.id)
+            guard try phase(of: activityModel) == .inProgress,
+                  activityModel.artworkID == record.artworkID.rawValue else {
+                throw FurtherStoreError.invalidActivityPhase
+            }
+            let previous = try self.checkpoint(from: activityModel)
+            guard checkpoint.assignment == previous.assignment,
+                  checkpoint.origin == previous.origin,
+                  checkpoint.capturedAt >= previous.capturedAt,
+                  record.id == checkpoint.assignment.activityID,
+                  record.artworkID == checkpoint.assignment.artworkID,
+                  record.environment == checkpoint.assignment.environment,
+                  record.origin == checkpoint.origin,
+                  record.summary.startedAt == checkpoint.assignment.startedAt,
+                  record.summary.startTimeZoneIdentifier
+                    == checkpoint.assignment.startTimeZoneIdentifier,
+                  record.summary.endedAt == checkpoint.capturedAt,
+                  record.summary.activeDuration == checkpoint.activeDuration,
+                  record.summary.pausedDuration == checkpoint.pausedDuration,
+                  record.summary.distance == checkpoint.distance,
+                  record.events == checkpoint.events,
+                  record.routeSamples == checkpoint.routeSamples,
+                  record.expression == draft.expression else {
+                throw FurtherStoreError.storedIdentityMismatch
+            }
+
+            activityModel.phaseRawValue = StoredActivityPhase.reflectionDraft.rawValue
+            activityModel.checkpointData = try PersistenceCodec.encode(StoredCheckpoint(checkpoint))
+            activityModel.recordData = try PersistenceCodec.encode(StoredActivityRecord(record))
+            activityModel.reflectionDraftData = try PersistenceCodec.encode(draft)
+            try replaceRouteSamples(record.routeSamples, activityID: record.id)
+        }
+    }
+
     func saveReflectionDraft(
         _ draft: ReflectionDraft,
         activityID: ActivityID

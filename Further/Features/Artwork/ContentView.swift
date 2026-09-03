@@ -16,8 +16,16 @@ struct AppRootView: View {
             await model.start()
         }
         .onChange(of: scenePhase) { _, newPhase in
-            guard newPhase == .active else { return }
-            Task { await model.refreshCurrentArtwork() }
+            switch newPhase {
+            case .active:
+                Task { await model.appBecameActive() }
+            case .background:
+                Task { await model.appDidEnterBackground() }
+            case .inactive:
+                break
+            @unknown default:
+                break
+            }
         }
         .alert(
             AppText.recoveryNoticeTitle,
@@ -43,7 +51,20 @@ struct AppRootView: View {
                 Task { await model.createArtwork(cycle: cycle) }
             }
         case let .currentArtwork(state):
-            CurrentArtworkView(state: state)
+            CurrentArtworkView(state: state, onStartRun: model.beginRunPreparation)
+        case let .run(state):
+            RunFlowView(
+                state: state,
+                isCommandInFlight: model.isRunCommandInFlight,
+                onChooseIndoor: model.chooseIndoorRun,
+                onCancelPreparation: model.cancelRunPreparation,
+                onStart: { Task { await model.confirmIndoorRunStart() } },
+                onPause: { Task { await model.pauseRun() } },
+                onResume: { Task { await model.resumeRun() } },
+                onRequestEnd: model.requestRunEnd,
+                onCancelEnd: model.cancelRunEnd,
+                onConfirmEnd: { Task { await model.confirmRunEnd() } }
+            )
         case .blocked:
             ContentUnavailableView {
                 Label(AppText.dataUnavailableTitle, systemImage: "externaldrive.badge.exclamationmark")
@@ -148,6 +169,7 @@ private struct ArtworkCycleSelectionView: View {
 
 private struct CurrentArtworkView: View {
     let state: CurrentArtworkViewState
+    let onStartRun: () -> Void
 
     var body: some View {
         ScrollView {
@@ -169,6 +191,13 @@ private struct CurrentArtworkView: View {
                     Text(AppText.blankArtworkMessage)
                         .font(.body)
                         .foregroundStyle(.secondary)
+                }
+
+                if state.presentation.phase != .completed {
+                    Button(AppText.prepareRun, action: onStartRun)
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.large)
+                        .accessibilityIdentifier("artwork.prepare-run")
                 }
             }
             .padding(24)

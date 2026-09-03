@@ -1,6 +1,6 @@
 # Further 实施计划
 
-> 状态：实施中；阶段 0 至阶段 3 已完成并提交
+> 状态：实施中；阶段 0 至阶段 4 已完成并提交
 
 ## 目的
 
@@ -100,6 +100,8 @@ SwiftData、`ModelContainer`、actor 隔离，以及领域类型与数据库模�
 SwiftUI 状态流、Observation、`NavigationStack` 和依赖注入。
 
 ## 阶段 4：RunRecorder 与室内跑步
+
+> 状态：已完成并提交
 
 ### 范围
 
