@@ -14,6 +14,18 @@
 		B10000000000000000000002 /* AppText.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000002 /* AppText.swift */; };
 		B10000000000000000000003 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000003 /* Localizable.xcstrings */; };
 		B10000000000000000000004 /* FurtherUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000004 /* FurtherUITests.swift */; };
+		D10000000000000000000001 /* DomainValidationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000001 /* DomainValidationError.swift */; };
+		D10000000000000000000002 /* Identifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000002 /* Identifiers.swift */; };
+		D10000000000000000000003 /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000003 /* Activity.swift */; };
+		D10000000000000000000004 /* Expression.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000004 /* Expression.swift */; };
+		D10000000000000000000005 /* SharedActivityRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000005 /* SharedActivityRecord.swift */; };
+		D10000000000000000000006 /* Artwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000006 /* Artwork.swift */; };
+		D10000000000000000000007 /* TimeSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000007 /* TimeSource.swift */; };
+		D10000000000000000000008 /* DomainTestSamples.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000008 /* DomainTestSamples.swift */; };
+		D10000000000000000000009 /* ActivityValueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20000000000000000000009 /* ActivityValueTests.swift */; };
+		D1000000000000000000000A /* ArtworkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2000000000000000000000A /* ArtworkTests.swift */; };
+		D1000000000000000000000B /* SharedActivityRecordTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2000000000000000000000B /* SharedActivityRecordTests.swift */; };
+		D1000000000000000000000C /* TimeSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2000000000000000000000C /* TimeSourceTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +56,18 @@
 		B20000000000000000000003 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		B20000000000000000000004 /* FurtherUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FurtherUITests.swift; sourceTree = "<group>"; };
 		B20000000000000000000005 /* FurtherUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FurtherUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D20000000000000000000001 /* DomainValidationError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainValidationError.swift; sourceTree = "<group>"; };
+		D20000000000000000000002 /* Identifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiers.swift; sourceTree = "<group>"; };
+		D20000000000000000000003 /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
+		D20000000000000000000004 /* Expression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Expression.swift; sourceTree = "<group>"; };
+		D20000000000000000000005 /* SharedActivityRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedActivityRecord.swift; sourceTree = "<group>"; };
+		D20000000000000000000006 /* Artwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Artwork.swift; sourceTree = "<group>"; };
+		D20000000000000000000007 /* TimeSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeSource.swift; sourceTree = "<group>"; };
+		D20000000000000000000008 /* DomainTestSamples.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainTestSamples.swift; sourceTree = "<group>"; };
+		D20000000000000000000009 /* ActivityValueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityValueTests.swift; sourceTree = "<group>"; };
+		D2000000000000000000000A /* ArtworkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkTests.swift; sourceTree = "<group>"; };
+		D2000000000000000000000B /* SharedActivityRecordTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedActivityRecordTests.swift; sourceTree = "<group>"; };
+		D2000000000000000000000C /* TimeSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeSourceTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +124,7 @@
 			isa = PBXGroup;
 			children = (
 				A20000000000000000000003 /* FurtherTests.swift */,
+				D70000000000000000000001 /* Domain */,
 			);
 			path = FurtherTests;
 			sourceTree = "<group>";
@@ -126,6 +151,13 @@
 		B70000000000000000000002 /* Domain */ = {
 			isa = PBXGroup;
 			children = (
+				D20000000000000000000001 /* DomainValidationError.swift */,
+				D20000000000000000000002 /* Identifiers.swift */,
+				D20000000000000000000003 /* Activity.swift */,
+				D20000000000000000000004 /* Expression.swift */,
+				D20000000000000000000005 /* SharedActivityRecord.swift */,
+				D20000000000000000000006 /* Artwork.swift */,
+				D20000000000000000000007 /* TimeSource.swift */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -237,6 +269,18 @@
 				B20000000000000000000004 /* FurtherUITests.swift */,
 			);
 			path = FurtherUITests;
+			sourceTree = "<group>";
+		};
+		D70000000000000000000001 /* Domain */ = {
+			isa = PBXGroup;
+			children = (
+				D20000000000000000000008 /* DomainTestSamples.swift */,
+				D20000000000000000000009 /* ActivityValueTests.swift */,
+				D2000000000000000000000A /* ArtworkTests.swift */,
+				D2000000000000000000000B /* SharedActivityRecordTests.swift */,
+				D2000000000000000000000C /* TimeSourceTests.swift */,
+			);
+			path = Domain;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -379,6 +423,13 @@
 				A10000000000000000000001 /* FurtherApp.swift in Sources */,
 				B10000000000000000000001 /* AppComposition.swift in Sources */,
 				B10000000000000000000002 /* AppText.swift in Sources */,
+				D10000000000000000000001 /* DomainValidationError.swift in Sources */,
+				D10000000000000000000002 /* Identifiers.swift in Sources */,
+				D10000000000000000000003 /* Activity.swift in Sources */,
+				D10000000000000000000004 /* Expression.swift in Sources */,
+				D10000000000000000000005 /* SharedActivityRecord.swift in Sources */,
+				D10000000000000000000006 /* Artwork.swift in Sources */,
+				D10000000000000000000007 /* TimeSource.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -387,6 +438,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				A10000000000000000000003 /* FurtherTests.swift in Sources */,
+				D10000000000000000000008 /* DomainTestSamples.swift in Sources */,
+				D10000000000000000000009 /* ActivityValueTests.swift in Sources */,
+				D1000000000000000000000A /* ArtworkTests.swift in Sources */,
+				D1000000000000000000000B /* SharedActivityRecordTests.swift in Sources */,
+				D1000000000000000000000C /* TimeSourceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
