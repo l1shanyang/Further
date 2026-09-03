@@ -1,24 +1,241 @@
 import SwiftUI
 
-struct ContentView: View {
+struct AppRootView: View {
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var model: AppRootModel
+
+    init(model: AppRootModel) {
+        _model = State(initialValue: model)
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Spacer()
-
-            Text(AppText.productName)
-                .font(.system(size: 48, weight: .semibold, design: .rounded))
-                .tracking(-1.5)
-                .accessibilityIdentifier("launch.product-name")
-
-            Text(AppText.launchTagline)
-                .font(.callout)
-                .foregroundStyle(.secondary)
-                .accessibilityIdentifier("launch.tagline")
-
-            Spacer()
+        NavigationStack {
+            content
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(32)
+        .task {
+            await model.start()
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            guard newPhase == .active else { return }
+            Task { await model.refreshCurrentArtwork() }
+        }
+        .alert(
+            AppText.recoveryNoticeTitle,
+            isPresented: Binding(
+                get: { model.recoveryNotice != nil },
+                set: { if !$0 { model.dismissRecoveryNotice() } }
+            )
+        ) {
+            Button(AppText.ok) { model.dismissRecoveryNotice() }
+        } message: {
+            Text(recoveryNoticeMessage)
+        }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        switch model.state {
+        case .loading:
+            ProgressView()
+                .accessibilityIdentifier("root.loading")
+        case let .cycleSelection(isCreating):
+            ArtworkCycleSelectionView(isCreating: isCreating) { cycle in
+                Task { await model.createArtwork(cycle: cycle) }
+            }
+        case let .currentArtwork(state):
+            CurrentArtworkView(state: state)
+        case .blocked:
+            ContentUnavailableView {
+                Label(AppText.dataUnavailableTitle, systemImage: "externaldrive.badge.exclamationmark")
+            } description: {
+                Text(AppText.dataUnavailableMessage)
+            } actions: {
+                Button(AppText.tryAgain) { Task { await model.start() } }
+            }
+            .accessibilityIdentifier("root.blocked")
+        }
+    }
+
+    private var recoveryNoticeMessage: String {
+        guard let notice = model.recoveryNotice else { return "" }
+        if notice.interruptedActivityCount > 0 {
+            return AppText.interruptedRunSaved
+        }
+        return AppText.reflectionSaved
+    }
+}
+
+private struct ArtworkCycleSelectionView: View {
+    let isCreating: Bool
+    let onConfirm: (ArtworkCycle) -> Void
+
+    @State private var selection = ArtworkCycleOption.oneMonth
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 28) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(AppText.productName)
+                        .font(.headline)
+                    Text(AppText.chooseCycleTitle)
+                        .font(.largeTitle.bold())
+                    Text(AppText.chooseCycleMessage)
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                }
+
+                optionSection(
+                    title: AppText.timeCycle,
+                    options: ArtworkCycleOption.allCases.filter(\.isTimeCycle)
+                )
+                optionSection(
+                    title: AppText.milestoneCycle,
+                    options: ArtworkCycleOption.allCases.filter { !$0.isTimeCycle }
+                )
+
+                Button {
+                    onConfirm(selection.cycle)
+                } label: {
+                    HStack {
+                        Spacer()
+                        if isCreating {
+                            ProgressView()
+                        } else {
+                            Text(AppText.beginArtwork)
+                        }
+                        Spacer()
+                    }
+                    .frame(minHeight: 48)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(isCreating)
+                .accessibilityIdentifier("cycle.confirm")
+            }
+            .padding(24)
+        }
+        .navigationBarBackButtonHidden()
+        .accessibilityIdentifier("cycle.selection")
+    }
+
+    private func optionSection(
+        title: String,
+        options: [ArtworkCycleOption]
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.secondary)
+
+            ForEach(options) { option in
+                Button {
+                    selection = option
+                } label: {
+                    HStack {
+                        Text(option.title)
+                        Spacer()
+                        Image(systemName: selection == option ? "circle.inset.filled" : "circle")
+                            .foregroundStyle(selection == option ? Color.primary : Color.secondary)
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .padding(.vertical, 9)
+                .accessibilityIdentifier("cycle.option.\(option.rawValue)")
+            }
+        }
+    }
+}
+
+private struct CurrentArtworkView: View {
+    let state: CurrentArtworkViewState
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(AppText.productName)
+                        .font(.headline)
+                    Text(title)
+                        .font(.largeTitle.bold())
+                    Text(cycleDescription)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+
+                BasicArtworkView(description: state.presentation)
+                    .aspectRatio(0.82, contentMode: .fit)
+
+                if state.presentation.phase == .blank {
+                    Text(AppText.blankArtworkMessage)
+                        .font(.body)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .padding(24)
+        }
+        .navigationBarBackButtonHidden()
+        .accessibilityIdentifier("artwork.current")
+    }
+
+    private var title: String {
+        switch state.presentation.phase {
+        case .blank: AppText.blankArtworkTitle
+        case .accumulating: AppText.accumulatingArtworkTitle
+        case .completed: AppText.completedArtworkTitle
+        }
+    }
+
+    private var cycleDescription: String {
+        switch state.artwork.cycle {
+        case let .time(duration):
+            switch duration {
+            case .oneMonth: AppText.oneMonth
+            case .threeMonths: AppText.threeMonths
+            case .oneYear: AppText.oneYear
+            }
+        case let .milestone(milestone):
+            switch milestone {
+            case .tenKilometers: AppText.tenKilometers
+            case .halfMarathon: AppText.halfMarathon
+            case .marathon: AppText.marathon
+            }
+        }
+    }
+}
+
+private struct BasicArtworkView: View {
+    let description: BasicArtworkDescription
+
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack {
+                RoundedRectangle(cornerRadius: 28)
+                    .fill(Color.secondary.opacity(0.06))
+                RoundedRectangle(cornerRadius: 28)
+                    .stroke(Color.secondary.opacity(0.14), lineWidth: 1)
+
+                ForEach(description.marks) { mark in
+                    Circle()
+                        .fill(Color(
+                            red: mark.color.red,
+                            green: mark.color.green,
+                            blue: mark.color.blue,
+                            opacity: mark.color.opacity
+                        ))
+                        .frame(
+                            width: geometry.size.width * mark.normalizedDiameter,
+                            height: geometry.size.width * mark.normalizedDiameter
+                        )
+                        .position(
+                            x: geometry.size.width * mark.normalizedX,
+                            y: geometry.size.height * mark.normalizedY
+                        )
+                }
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(AppText.artworkCanvas)
+        .accessibilityValue(String(description.marks.count))
     }
 }
 

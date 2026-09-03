@@ -47,6 +47,32 @@ actor FurtherStore {
         return try artwork(from: model)
     }
 
+    func records(for artworkID: ArtworkID) throws -> [SharedActivityRecordV1] {
+        let artworkModel = try requiredArtworkModel(id: artworkID)
+        let artwork = try artwork(from: artworkModel)
+        let modelsByID = Dictionary(
+            uniqueKeysWithValues: try activityModels().map { ($0.id, $0) }
+        )
+
+        return try artwork.activityIDs.compactMap { activityID in
+            guard let model = modelsByID[activityID.rawValue],
+                  try phase(of: model) == .finalized else {
+                return nil
+            }
+            return try record(from: model)
+        }
+    }
+
+    func evaluateCurrentArtwork(at date: Date) throws -> Artwork? {
+        try transaction {
+            guard let model = try singleCurrentArtworkModel() else { return nil }
+            var artwork = try artwork(from: model)
+            artwork.evaluate(at: date)
+            model.snapshotData = try PersistenceCodec.encode(StoredArtworkSnapshot(artwork))
+            return artwork
+        }
+    }
+
     func startActivity(
         id activityID: ActivityID = ActivityID(),
         environment: RunningEnvironment,

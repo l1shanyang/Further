@@ -1,6 +1,30 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "action.ok" : {
+      "comment" : "Dismiss button title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
+    },
+    "action.try-again" : {
+      "comment" : "Retry button title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try again"
+          }
+        }
+      }
+    },
     "app.name" : {
       "comment" : "The product name shown on the launch page.",
       "extractionState" : "manual",
@@ -13,6 +37,222 @@
         }
       }
     },
+    "artwork.accumulating.title" : {
+      "comment" : "Title for an accumulating current artwork.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your current artwork"
+          }
+        }
+      }
+    },
+    "artwork.blank.message" : {
+      "comment" : "Explanation for a blank artwork with no run marks.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your first run will leave the first mark."
+          }
+        }
+      }
+    },
+    "artwork.blank.title" : {
+      "comment" : "Title for a blank current artwork.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A new artwork"
+          }
+        }
+      }
+    },
+    "artwork.canvas" : {
+      "comment" : "Accessibility label for the artwork canvas.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Current artwork"
+          }
+        }
+      }
+    },
+    "artwork.completed.title" : {
+      "comment" : "Title for a completed current artwork.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This artwork is complete"
+          }
+        }
+      }
+    },
+    "cycle.begin" : {
+      "comment" : "Button that creates the selected first artwork.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Begin this artwork"
+          }
+        }
+      }
+    },
+    "cycle.choose.message" : {
+      "comment" : "Explanation shown before choosing an artwork cycle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A cycle gives this artwork a boundary. It begins with your first run."
+          }
+        }
+      }
+    },
+    "cycle.choose.title" : {
+      "comment" : "Title for the first artwork cycle selection page.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose an artwork cycle."
+          }
+        }
+      }
+    },
+    "cycle.half-marathon" : {
+      "comment" : "Half marathon milestone.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Half marathon"
+          }
+        }
+      }
+    },
+    "cycle.marathon" : {
+      "comment" : "Marathon milestone.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Marathon"
+          }
+        }
+      }
+    },
+    "cycle.milestone" : {
+      "comment" : "Milestone cycle section title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Milestone"
+          }
+        }
+      }
+    },
+    "cycle.one-month" : {
+      "comment" : "One month cycle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One month"
+          }
+        }
+      }
+    },
+    "cycle.one-year" : {
+      "comment" : "One year cycle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One year"
+          }
+        }
+      }
+    },
+    "cycle.ten-kilometers" : {
+      "comment" : "Ten kilometer milestone.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "10 kilometers"
+          }
+        }
+      }
+    },
+    "cycle.three-months" : {
+      "comment" : "Three month cycle.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Three months"
+          }
+        }
+      }
+    },
+    "cycle.time" : {
+      "comment" : "Time cycle section title.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time"
+          }
+        }
+      }
+    },
+    "error.data-unavailable.message" : {
+      "comment" : "Blocking database error explanation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing has been replaced. Try opening Further again."
+          }
+        }
+      }
+    },
+    "error.data-unavailable.title" : {
+      "comment" : "Blocking title when the local database cannot be opened.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your data couldn’t be opened."
+          }
+        }
+      }
+    },
     "launch.tagline" : {
       "comment" : "The quiet tagline shown below the product name.",
       "extractionState" : "manual",
@@ -21,6 +261,42 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "still going."
+          }
+        }
+      }
+    },
+    "recovery.interrupted-run" : {
+      "comment" : "Message after an interrupted run is finalized on startup.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The last reliable details from your previous run were saved."
+          }
+        }
+      }
+    },
+    "recovery.reflection" : {
+      "comment" : "Message after a reflection draft is finalized on startup.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your last saved expression was added to the artwork."
+          }
+        }
+      }
+    },
+    "recovery.title" : {
+      "comment" : "Title for a one-time startup recovery notice.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your run was saved"
           }
         }
       }

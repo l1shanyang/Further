@@ -35,6 +35,11 @@
 		E10000000000000000000007 /* AppBootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000007 /* AppBootstrap.swift */; };
 		E10000000000000000000008 /* FurtherStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000008 /* FurtherStoreTests.swift */; };
 		E10000000000000000000009 /* AppBootstrapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000009 /* AppBootstrapTests.swift */; };
+		F10000000000000000000001 /* AppRootModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000001 /* AppRootModel.swift */; };
+		F10000000000000000000002 /* BasicArtworkRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000002 /* BasicArtworkRenderer.swift */; };
+		F10000000000000000000003 /* ArtworkCycleOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000003 /* ArtworkCycleOption.swift */; };
+		F10000000000000000000004 /* AppRootModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000004 /* AppRootModelTests.swift */; };
+		F10000000000000000000005 /* BasicArtworkRendererTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000005 /* BasicArtworkRendererTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -86,6 +91,11 @@
 		E20000000000000000000007 /* AppBootstrap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBootstrap.swift; sourceTree = "<group>"; };
 		E20000000000000000000008 /* FurtherStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FurtherStoreTests.swift; sourceTree = "<group>"; };
 		E20000000000000000000009 /* AppBootstrapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBootstrapTests.swift; sourceTree = "<group>"; };
+		F20000000000000000000001 /* AppRootModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootModel.swift; sourceTree = "<group>"; };
+		F20000000000000000000002 /* BasicArtworkRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicArtworkRenderer.swift; sourceTree = "<group>"; };
+		F20000000000000000000003 /* ArtworkCycleOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkCycleOption.swift; sourceTree = "<group>"; };
+		F20000000000000000000004 /* AppRootModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootModelTests.swift; sourceTree = "<group>"; };
+		F20000000000000000000005 /* BasicArtworkRendererTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicArtworkRendererTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -143,6 +153,7 @@
 			children = (
 				A20000000000000000000003 /* FurtherTests.swift */,
 				E70000000000000000000001 /* App */,
+				F70000000000000000000001 /* Artwork */,
 				D70000000000000000000001 /* Domain */,
 				E70000000000000000000002 /* Persistence */,
 			);
@@ -165,6 +176,7 @@
 				A20000000000000000000001 /* FurtherApp.swift */,
 				B20000000000000000000001 /* AppComposition.swift */,
 				E20000000000000000000007 /* AppBootstrap.swift */,
+				F20000000000000000000001 /* AppRootModel.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -213,6 +225,7 @@
 			isa = PBXGroup;
 			children = (
 				A20000000000000000000002 /* ContentView.swift */,
+				F20000000000000000000003 /* ArtworkCycleOption.swift */,
 			);
 			path = Artwork;
 			sourceTree = "<group>";
@@ -278,6 +291,7 @@
 		B7000000000000000000000E /* Artwork */ = {
 			isa = PBXGroup;
 			children = (
+				F20000000000000000000002 /* BasicArtworkRenderer.swift */,
 			);
 			path = Artwork;
 			sourceTree = "<group>";
@@ -314,6 +328,7 @@
 			isa = PBXGroup;
 			children = (
 				E20000000000000000000009 /* AppBootstrapTests.swift */,
+				F20000000000000000000004 /* AppRootModelTests.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -324,6 +339,14 @@
 				E20000000000000000000008 /* FurtherStoreTests.swift */,
 			);
 			path = Persistence;
+			sourceTree = "<group>";
+		};
+		F70000000000000000000001 /* Artwork */ = {
+			isa = PBXGroup;
+			children = (
+				F20000000000000000000005 /* BasicArtworkRendererTests.swift */,
+			);
+			path = Artwork;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -480,6 +503,9 @@
 				E10000000000000000000005 /* PersistenceMapper.swift in Sources */,
 				E10000000000000000000006 /* FurtherStore.swift in Sources */,
 				E10000000000000000000007 /* AppBootstrap.swift in Sources */,
+				F10000000000000000000001 /* AppRootModel.swift in Sources */,
+				F10000000000000000000002 /* BasicArtworkRenderer.swift in Sources */,
+				F10000000000000000000003 /* ArtworkCycleOption.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -495,6 +521,8 @@
 				D1000000000000000000000C /* TimeSourceTests.swift in Sources */,
 				E10000000000000000000008 /* FurtherStoreTests.swift in Sources */,
 				E10000000000000000000009 /* AppBootstrapTests.swift in Sources */,
+				F10000000000000000000004 /* AppRootModelTests.swift in Sources */,
+				F10000000000000000000005 /* BasicArtworkRendererTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -22,6 +22,8 @@ enum PersistenceCodec {
 struct StoredArtworkSnapshot: Codable, Sendable {
     let id: ArtworkID
     let cycle: ArtworkCycle
+    let visualGenerationVersion: String
+    let visualSeed: UUID
     let state: ArtworkState
     let activityIDs: [ActivityID]
     let pendingActivityID: ActivityID?
@@ -29,15 +31,47 @@ struct StoredArtworkSnapshot: Codable, Sendable {
     init(_ artwork: Artwork) {
         id = artwork.id
         cycle = artwork.cycle
+        visualGenerationVersion = artwork.visualGenerationVersion
+        visualSeed = artwork.visualSeed
         state = artwork.state
         activityIDs = artwork.activityIDs
         pendingActivityID = artwork.pendingActivityID
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case cycle
+        case visualGenerationVersion
+        case visualSeed
+        case state
+        case activityIDs
+        case pendingActivityID
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(ArtworkID.self, forKey: .id)
+        cycle = try container.decode(ArtworkCycle.self, forKey: .cycle)
+        visualGenerationVersion = try container.decodeIfPresent(
+            String.self,
+            forKey: .visualGenerationVersion
+        ) ?? Artwork.initialVisualGenerationVersion
+        visualSeed = try container.decodeIfPresent(UUID.self, forKey: .visualSeed)
+            ?? id.rawValue
+        state = try container.decode(ArtworkState.self, forKey: .state)
+        activityIDs = try container.decode([ActivityID].self, forKey: .activityIDs)
+        pendingActivityID = try container.decodeIfPresent(
+            ActivityID.self,
+            forKey: .pendingActivityID
+        )
     }
 
     func domainValue() throws -> Artwork {
         try Artwork(
             id: id,
             cycle: cycle,
+            visualGenerationVersion: visualGenerationVersion,
+            visualSeed: visualSeed,
             state: state,
             activityIDs: activityIDs,
             pendingActivityID: pendingActivityID

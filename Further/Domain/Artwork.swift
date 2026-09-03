@@ -70,15 +70,26 @@ struct ActivityAssignment: Codable, Equatable, Sendable {
 }
 
 struct Artwork: Codable, Equatable, Sendable {
+    static let initialVisualGenerationVersion = "basic-v1"
+
     let id: ArtworkID
     let cycle: ArtworkCycle
+    let visualGenerationVersion: String
+    let visualSeed: UUID
     private(set) var state: ArtworkState
     private(set) var activityIDs: [ActivityID]
     private(set) var pendingActivityID: ActivityID?
 
-    init(id: ArtworkID = ArtworkID(), cycle: ArtworkCycle) {
+    init(
+        id: ArtworkID = ArtworkID(),
+        cycle: ArtworkCycle,
+        visualGenerationVersion: String = Self.initialVisualGenerationVersion,
+        visualSeed: UUID = UUID()
+    ) {
         self.id = id
         self.cycle = cycle
+        self.visualGenerationVersion = visualGenerationVersion
+        self.visualSeed = visualSeed
         state = .blank
         activityIDs = []
         pendingActivityID = nil
@@ -87,12 +98,16 @@ struct Artwork: Codable, Equatable, Sendable {
     init(
         id: ArtworkID,
         cycle: ArtworkCycle,
+        visualGenerationVersion: String,
+        visualSeed: UUID,
         state: ArtworkState,
         activityIDs: [ActivityID],
         pendingActivityID: ActivityID?
     ) throws {
         self.id = id
         self.cycle = cycle
+        self.visualGenerationVersion = visualGenerationVersion
+        self.visualSeed = visualSeed
         self.state = state
         self.activityIDs = activityIDs
         self.pendingActivityID = pendingActivityID
@@ -100,6 +115,9 @@ struct Artwork: Codable, Equatable, Sendable {
     }
 
     func validate() throws {
+        guard !visualGenerationVersion.isEmpty else {
+            throw DomainValidationError.invalidArtworkState
+        }
         guard Set(activityIDs).count == activityIDs.count else {
             throw DomainValidationError.invalidArtworkState
         }
@@ -152,6 +170,48 @@ struct Artwork: Codable, Equatable, Sendable {
                 throw DomainValidationError.invalidArtworkState
             }
         }
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case cycle
+        case visualGenerationVersion
+        case visualSeed
+        case state
+        case activityIDs
+        case pendingActivityID
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let id = try container.decode(ArtworkID.self, forKey: .id)
+        try self.init(
+            id: id,
+            cycle: container.decode(ArtworkCycle.self, forKey: .cycle),
+            visualGenerationVersion: container.decodeIfPresent(
+                String.self,
+                forKey: .visualGenerationVersion
+            ) ?? Self.initialVisualGenerationVersion,
+            visualSeed: container.decodeIfPresent(UUID.self, forKey: .visualSeed)
+                ?? id.rawValue,
+            state: container.decode(ArtworkState.self, forKey: .state),
+            activityIDs: container.decode([ActivityID].self, forKey: .activityIDs),
+            pendingActivityID: container.decodeIfPresent(
+                ActivityID.self,
+                forKey: .pendingActivityID
+            )
+        )
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(cycle, forKey: .cycle)
+        try container.encode(visualGenerationVersion, forKey: .visualGenerationVersion)
+        try container.encode(visualSeed, forKey: .visualSeed)
+        try container.encode(state, forKey: .state)
+        try container.encode(activityIDs, forKey: .activityIDs)
+        try container.encodeIfPresent(pendingActivityID, forKey: .pendingActivityID)
     }
 
     mutating func beginActivity(

@@ -39,6 +39,9 @@ struct AppComposition {
     }
 
     var rootView: some View {
-        ContentView()
+        AppRootView(model: AppRootModel(
+            bootstrap: bootstrap,
+            timeSource: timeSource
+        ))
     }
 }

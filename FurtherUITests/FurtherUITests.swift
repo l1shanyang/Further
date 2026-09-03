@@ -2,17 +2,19 @@ import XCTest
 
 @MainActor
 final class FurtherUITests: XCTestCase {
-    func testLaunchPage() {
+    func testFirstLaunchCreatesBlankArtwork() {
         let app = XCUIApplication()
         app.launchArguments.append("-ui-testing")
         app.launch()
 
-        let productName = app.staticTexts["launch.product-name"]
-        let tagline = app.staticTexts["launch.tagline"]
+        let selection = app.scrollViews["cycle.selection"]
+        XCTAssertTrue(selection.waitForExistence(timeout: 5))
 
-        XCTAssertTrue(productName.waitForExistence(timeout: 5))
-        XCTAssertEqual(productName.label, "Further")
-        XCTAssertTrue(tagline.exists)
-        XCTAssertEqual(tagline.label, "still going.")
+        app.buttons["cycle.confirm"].tap()
+
+        let currentArtwork = app.scrollViews["artwork.current"]
+        XCTAssertTrue(currentArtwork.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["A new artwork"].exists)
+        XCTAssertTrue(app.staticTexts["Your first run will leave the first mark."].exists)
     }
 }
