@@ -24,10 +24,14 @@
 
 ## Agent skills
 
-### Issue tracker
+### Work tracking
 
-Issues and specs are tracked in GitHub Issues through the `gh` CLI. See `docs/agents/issue-tracker.md`.
+This personal project currently tracks implementation stages in `docs/technical/implementation-plan.md`. Do not create GitHub Issues unless the user explicitly enables issue tracking; if enabled, see `docs/agents/issue-tracker.md`.
 
 ### Domain docs
 
 This repository uses a single-context domain documentation layout. See `docs/agents/domain.md`.
+
+### Implementation context
+
+Before implementation work, read `docs/agents/coding-handoff.md` for the current phase, required reading order, and next task.
