@@ -125,4 +125,41 @@ final class FurtherUITests: XCTestCase {
         XCTAssertFalse(app.buttons["Delete"].exists)
         XCTAssertFalse(app.buttons["Edit"].exists)
     }
+
+    func testCompletedArtworkMovesIntoCollectionWhenNextArtworkStarts() {
+        let app = XCUIApplication()
+        app.launchArguments.append("-ui-testing")
+        app.launch()
+
+        XCTAssertTrue(app.scrollViews["cycle.selection"].waitForExistence(timeout: 5))
+        app.buttons["cycle.option.tenKilometers"].tap()
+        app.buttons["cycle.confirm"].tap()
+        app.buttons["artwork.prepare-run"].tap()
+        app.buttons["run.choose-indoor"].tap()
+        app.buttons["run.start"].tap()
+        XCTAssertTrue(app.buttons["run.end"].waitForExistence(timeout: 6))
+        app.buttons["run.end"].tap()
+        app.buttons["run.confirm-end"].tap()
+        XCTAssertTrue(app.scrollViews["reflection.expression"].waitForExistence(timeout: 3))
+        app.buttons["reflection.keep-silence"].tap()
+        let distance = app.textFields["reflection.distance"]
+        XCTAssertTrue(distance.waitForExistence(timeout: 3))
+        distance.tap()
+        distance.typeText("10")
+        app.buttons["reflection.save-distance"].tap()
+        app.buttons["reflection.view-artwork"].tap()
+
+        XCTAssertTrue(app.buttons["artwork.start-next"].waitForExistence(timeout: 3))
+        app.buttons["artwork.start-next"].tap()
+        XCTAssertTrue(app.scrollViews["cycle.selection"].waitForExistence(timeout: 3))
+        app.buttons["cycle.confirm"].tap()
+        XCTAssertTrue(app.staticTexts["A new artwork"].waitForExistence(timeout: 3))
+
+        app.buttons["artwork.collection"].tap()
+        XCTAssertTrue(app.collectionViews["collection.list"].waitForExistence(timeout: 3))
+        app.buttons["collection.artwork"].tap()
+        XCTAssertTrue(app.scrollViews["collection.detail"].waitForExistence(timeout: 3))
+        XCTAssertFalse(app.buttons["Delete"].exists)
+        XCTAssertFalse(app.buttons["Share"].exists)
+    }
 }

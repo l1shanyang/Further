@@ -25,7 +25,17 @@ enum BasicArtworkRenderer {
         artwork: Artwork,
         records: [SharedActivityRecordV1]
     ) -> BasicArtworkDescription {
-        let recordsByID = Dictionary(uniqueKeysWithValues: records.map { ($0.id, $0) })
+        render(
+            artwork: artwork,
+            entries: records.map { ActivityRecordIndexEntry(record: $0) }
+        )
+    }
+
+    static func render(
+        artwork: Artwork,
+        entries: [ActivityRecordIndexEntry]
+    ) -> BasicArtworkDescription {
+        let recordsByID = Dictionary(uniqueKeysWithValues: entries.map { ($0.id, $0) })
         let marks = artwork.activityIDs.compactMap { activityID -> ArtworkMarkDescription? in
             guard let record = recordsByID[activityID] else { return nil }
             let seed = "\(artwork.visualSeed.uuidString):\(activityID.rawValue.uuidString)"

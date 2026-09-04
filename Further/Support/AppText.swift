@@ -353,6 +353,31 @@ enum AppText {
         localized: "record.route.missing",
         defaultValue: "Route not recorded"
     )
+    static let startNextArtwork = String(
+        localized: "artwork.next.start",
+        defaultValue: "Start the next artwork"
+    )
+    static let collection = String(localized: "collection.title", defaultValue: "Collection")
+    static let collectionEmptyTitle = String(
+        localized: "collection.empty.title",
+        defaultValue: "No collected artworks yet"
+    )
+    static let collectionEmptyMessage = String(
+        localized: "collection.empty.message",
+        defaultValue: "A completed artwork appears here after you begin the next one."
+    )
+    static let artworkCycle = String(
+        localized: "collection.artwork.cycle",
+        defaultValue: "Cycle"
+    )
+    static let artworkPeriod = String(
+        localized: "collection.artwork.period",
+        defaultValue: "Period"
+    )
+    static let runCount = String(
+        localized: "collection.artwork.run-count",
+        defaultValue: "Runs"
+    )
 
     static func feelingColor(_ number: Int) -> String {
         String.localizedStringWithFormat(

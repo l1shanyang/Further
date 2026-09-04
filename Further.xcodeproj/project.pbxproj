@@ -56,6 +56,10 @@
 		J10000000000000000000003 /* ActivityRouteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = J20000000000000000000003 /* ActivityRouteView.swift */; };
 		J10000000000000000000004 /* LookbackStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = J20000000000000000000004 /* LookbackStateTests.swift */; };
 		J10000000000000000000005 /* ActivityRecordIndexEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = J20000000000000000000005 /* ActivityRecordIndexEntry.swift */; };
+		K10000000000000000000001 /* ArtworkCollectionEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = K20000000000000000000001 /* ArtworkCollectionEntry.swift */; };
+		K10000000000000000000002 /* CollectionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = K20000000000000000000002 /* CollectionState.swift */; };
+		K10000000000000000000003 /* CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = K20000000000000000000003 /* CollectionView.swift */; };
+		K10000000000000000000004 /* CollectionStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = K20000000000000000000004 /* CollectionStateTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -129,6 +133,10 @@
 		J20000000000000000000003 /* ActivityRouteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityRouteView.swift; sourceTree = "<group>"; };
 		J20000000000000000000004 /* LookbackStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LookbackStateTests.swift; sourceTree = "<group>"; };
 		J20000000000000000000005 /* ActivityRecordIndexEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityRecordIndexEntry.swift; sourceTree = "<group>"; };
+		K20000000000000000000001 /* ArtworkCollectionEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkCollectionEntry.swift; sourceTree = "<group>"; };
+		K20000000000000000000002 /* CollectionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionState.swift; sourceTree = "<group>"; };
+		K20000000000000000000003 /* CollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionView.swift; sourceTree = "<group>"; };
+		K20000000000000000000004 /* CollectionStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionStateTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -191,6 +199,7 @@
 				G70000000000000000000001 /* Run */,
 				H70000000000000000000001 /* Reflection */,
 				J70000000000000000000001 /* Lookback */,
+				K70000000000000000000001 /* Collection */,
 				D70000000000000000000001 /* Domain */,
 				E70000000000000000000002 /* Persistence */,
 			);
@@ -231,6 +240,7 @@
 				E20000000000000000000001 /* ActivityCheckpoint.swift */,
 				E20000000000000000000002 /* ReflectionDraft.swift */,
 				J20000000000000000000005 /* ActivityRecordIndexEntry.swift */,
+				K20000000000000000000001 /* ArtworkCollectionEntry.swift */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -301,6 +311,8 @@
 		B70000000000000000000009 /* Collection */ = {
 			isa = PBXGroup;
 			children = (
+				K20000000000000000000002 /* CollectionState.swift */,
+				K20000000000000000000003 /* CollectionView.swift */,
 			);
 			path = Collection;
 			sourceTree = "<group>";
@@ -421,6 +433,14 @@
 				J20000000000000000000004 /* LookbackStateTests.swift */,
 			);
 			path = Lookback;
+			sourceTree = "<group>";
+		};
+		K70000000000000000000001 /* Collection */ = {
+			isa = PBXGroup;
+			children = (
+				K20000000000000000000004 /* CollectionStateTests.swift */,
+			);
+			path = Collection;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -592,6 +612,9 @@
 				J10000000000000000000002 /* LookbackView.swift in Sources */,
 				J10000000000000000000003 /* ActivityRouteView.swift in Sources */,
 				J10000000000000000000005 /* ActivityRecordIndexEntry.swift in Sources */,
+				K10000000000000000000001 /* ArtworkCollectionEntry.swift in Sources */,
+				K10000000000000000000002 /* CollectionState.swift in Sources */,
+				K10000000000000000000003 /* CollectionView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -613,6 +636,7 @@
 				H10000000000000000000003 /* ReflectionFlowTests.swift in Sources */,
 				I10000000000000000000004 /* LocationRouteAccumulatorTests.swift in Sources */,
 				J10000000000000000000004 /* LookbackStateTests.swift in Sources */,
+				K10000000000000000000004 /* CollectionStateTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -76,6 +76,64 @@ actor FurtherStore {
         }
     }
 
+    func artworkCollection() throws -> [ArtworkCollectionEntry] {
+        let archived = try artworkModels().compactMap { model -> Artwork? in
+            let artwork = try artwork(from: model)
+            guard case .archived = artwork.state else { return nil }
+            return artwork
+        }
+        let activityModelsByID = Dictionary(
+            uniqueKeysWithValues: try activityModels().map { ($0.id, $0) }
+        )
+
+        return try archived.map { artwork in
+            let records = try artwork.activityIDs.map { activityID in
+                guard let model = activityModelsByID[activityID.rawValue],
+                      try phase(of: model) == .finalized else {
+                    throw PersistenceMappingError.invalidStoredData
+                }
+                let stored = try requiredStoredRecord(from: model)
+                return ActivityRecordIndexEntry(
+                    id: stored.id,
+                    lifecycle: stored.lifecycle,
+                    summary: stored.summary,
+                    expression: stored.expression
+                )
+            }
+            return try ArtworkCollectionEntry(artwork: artwork, records: records)
+        }
+        .sorted {
+            if completedAt($0.artwork) != completedAt($1.artwork) {
+                return completedAt($0.artwork) > completedAt($1.artwork)
+            }
+            return $0.id.rawValue.uuidString > $1.id.rawValue.uuidString
+        }
+    }
+
+    func startNextArtwork(
+        cycle: ArtworkCycle,
+        archivedAt: Date,
+        id: ArtworkID = ArtworkID()
+    ) throws -> Artwork {
+        try transaction {
+            let previousModel = try requiredCurrentArtworkModel()
+            var previous = try artwork(from: previousModel)
+            try previous.archive(at: archivedAt)
+
+            let next = Artwork(id: id, cycle: cycle)
+            previousModel.snapshotData = try PersistenceCodec.encode(
+                StoredArtworkSnapshot(previous)
+            )
+            previousModel.isCurrent = false
+            modelContext.insert(FurtherSchemaV1.ArtworkModel(
+                id: id.rawValue,
+                isCurrent: true,
+                snapshotData: try PersistenceCodec.encode(StoredArtworkSnapshot(next))
+            ))
+            return next
+        }
+    }
+
     func evaluateCurrentArtwork(at date: Date) throws -> Artwork? {
         try transaction {
             guard let model = try singleCurrentArtworkModel() else { return nil }
@@ -94,7 +152,12 @@ actor FurtherStore {
         origin: ActivityOrigin,
         interruptionExpression: RecordExpression
     ) throws -> ActivityAssignment {
-        try transaction {
+        if let artwork = try evaluateCurrentArtwork(at: startedAt),
+           case .completed = artwork.state {
+            throw DomainValidationError.artworkNotAcceptingActivities
+        }
+
+        return try transaction {
             guard interruptionExpression.isSilence else {
                 throw DomainValidationError.invalidExpressionForLifecycle
             }
@@ -390,6 +453,7 @@ actor FurtherStore {
         let artworkModel = try requiredArtworkModel(id: record.artworkID)
         var artwork = try artwork(from: artworkModel)
         try artwork.include(record, finalizedAt: finalizedAt)
+        artwork.evaluate(at: finalizedAt)
 
         artworkModel.snapshotData = try PersistenceCodec.encode(StoredArtworkSnapshot(artwork))
         activityModel.phaseRawValue = StoredActivityPhase.finalized.rawValue
@@ -408,6 +472,13 @@ actor FurtherStore {
             modelContext.rollback()
             throw error
         }
+    }
+
+    private func completedAt(_ artwork: Artwork) -> Date {
+        guard case let .archived(_, completedAt, _) = artwork.state else {
+            return .distantPast
+        }
+        return completedAt
     }
 
     private func currentArtworkModels() throws -> [FurtherSchemaV1.ArtworkModel] {

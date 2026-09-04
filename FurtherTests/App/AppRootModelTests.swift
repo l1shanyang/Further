@@ -16,7 +16,10 @@ final class AppRootModelTests: XCTestCase {
         )
 
         await firstModel.start()
-        XCTAssertEqual(firstModel.state, .cycleSelection(isCreating: false))
+        XCTAssertEqual(firstModel.state, .cycleSelection(ArtworkCycleSelectionState(
+            context: .firstArtwork,
+            isCreating: false
+        )))
 
         await firstModel.createArtwork(cycle: .time(.oneMonth))
         guard case let .currentArtwork(firstState) = firstModel.state else {
@@ -207,6 +210,149 @@ final class AppRootModelTests: XCTestCase {
 
         model.showUpdatedArtwork()
         XCTAssertEqual(model.state, .currentArtwork(artwork))
+    }
+
+    func testCompletedArtworkCanStayThenAtomicallyMoveIntoCollection() async throws {
+        let container = try FurtherModelContainer.inMemory()
+        let source = ModelContainerSource { container }
+        let timeSource = ControlledTimeSource(
+            now: Date(timeIntervalSince1970: 1_810_550_000)
+        )
+        let model = AppRootModel(
+            bootstrap: AppBootstrap(containerSource: source, timeSource: timeSource),
+            timeSource: timeSource,
+            activityOrigin: DomainTestSamples.origin
+        )
+        await model.start()
+        await model.createArtwork(cycle: .milestone(.tenKilometers))
+        model.beginRunPreparation()
+        model.chooseIndoorRun()
+        await model.confirmIndoorRunStart()
+        try await timeSource.advance(by: 3)
+        await model.refreshRunSnapshot()
+        model.requestRunEnd()
+        await model.confirmRunEnd()
+        await model.keepReflectionSilent()
+        model.updateIndoorDistance("10")
+        await model.saveIndoorDistance()
+        model.showUpdatedArtwork()
+
+        guard case let .currentArtwork(completed) = model.state else {
+            return XCTFail("Expected the completed artwork to remain current")
+        }
+        XCTAssertEqual(completed.presentation.phase, .completed)
+
+        model.beginNextArtwork()
+        guard case let .cycleSelection(selection) = model.state,
+              case .nextArtwork = selection.context else {
+            return XCTFail("Expected next-artwork cycle selection")
+        }
+        model.cancelNextArtworkSelection()
+        XCTAssertEqual(model.state, .currentArtwork(completed))
+
+        model.beginNextArtwork()
+        await model.createArtwork(cycle: .time(.oneMonth))
+        guard case let .currentArtwork(next) = model.state else {
+            return XCTFail("Expected a new current artwork")
+        }
+        XCTAssertEqual(next.artwork.state, .blank)
+        XCTAssertNotEqual(next.artwork.id, completed.artwork.id)
+
+        await model.showCollection()
+        guard case let .collection(.list(collection)) = model.state else {
+            return XCTFail("Expected the artwork collection")
+        }
+        XCTAssertEqual(collection.artworks.map(\.id), [completed.artwork.id])
+
+        model.selectCollectedArtwork(completed.artwork.id)
+        guard case let .collection(.detail(detail)) = model.state else {
+            return XCTFail("Expected a collected artwork detail")
+        }
+        XCTAssertEqual(detail.presentation, completed.presentation)
+    }
+
+    func testReturningActiveCompletesAnExpiredTimeArtworkWithoutStartingAnother() async throws {
+        let container = try FurtherModelContainer.inMemory()
+        let source = ModelContainerSource { container }
+        let startedAt = Date(timeIntervalSince1970: 1_810_575_000)
+        let timeSource = ControlledTimeSource(now: startedAt)
+        let model = AppRootModel(
+            bootstrap: AppBootstrap(containerSource: source, timeSource: timeSource),
+            timeSource: timeSource,
+            activityOrigin: DomainTestSamples.origin
+        )
+        await model.start()
+        await model.createArtwork(cycle: .time(.oneMonth))
+        model.beginRunPreparation()
+        model.chooseIndoorRun()
+        await model.confirmIndoorRunStart()
+        try await timeSource.advance(by: 3)
+        await model.refreshRunSnapshot()
+        model.requestRunEnd()
+        await model.confirmRunEnd()
+        await model.keepReflectionSilent()
+        await model.skipIndoorDistance()
+        model.showUpdatedArtwork()
+
+        guard case let .currentArtwork(accumulating) = model.state,
+              case let .accumulating(period) = accumulating.artwork.state,
+              let endsAt = period.endsAt else {
+            return XCTFail("Expected an accumulating time artwork")
+        }
+        try await timeSource.advance(
+            by: endsAt.timeIntervalSince(await timeSource.now()) + 1
+        )
+
+        await model.appBecameActive()
+
+        guard case let .currentArtwork(completed) = model.state else {
+            return XCTFail("Expected the expired artwork to stay current")
+        }
+        XCTAssertEqual(completed.presentation.phase, .completed)
+        XCTAssertEqual(completed.artwork.id, accumulating.artwork.id)
+    }
+
+    func testStartingRunAfterTimeBoundaryReturnsToCompletedArtwork() async throws {
+        let container = try FurtherModelContainer.inMemory()
+        let source = ModelContainerSource { container }
+        let startedAt = Date(timeIntervalSince1970: 1_810_590_000)
+        let timeSource = ControlledTimeSource(now: startedAt)
+        let model = AppRootModel(
+            bootstrap: AppBootstrap(containerSource: source, timeSource: timeSource),
+            timeSource: timeSource,
+            activityOrigin: DomainTestSamples.origin
+        )
+        await model.start()
+        await model.createArtwork(cycle: .time(.oneMonth))
+        model.beginRunPreparation()
+        model.chooseIndoorRun()
+        await model.confirmIndoorRunStart()
+        try await timeSource.advance(by: 3)
+        await model.refreshRunSnapshot()
+        model.requestRunEnd()
+        await model.confirmRunEnd()
+        await model.keepReflectionSilent()
+        await model.skipIndoorDistance()
+        model.showUpdatedArtwork()
+
+        guard case let .currentArtwork(accumulating) = model.state,
+              case let .accumulating(period) = accumulating.artwork.state,
+              let endsAt = period.endsAt else {
+            return XCTFail("Expected an accumulating time artwork")
+        }
+        try await timeSource.advance(
+            by: endsAt.timeIntervalSince(await timeSource.now()) + 1
+        )
+
+        model.beginRunPreparation()
+        model.chooseIndoorRun()
+        await model.confirmIndoorRunStart()
+
+        guard case let .currentArtwork(completed) = model.state else {
+            return XCTFail("Expected the expired artwork instead of a blocked screen")
+        }
+        XCTAssertEqual(completed.presentation.phase, .completed)
+        XCTAssertEqual(completed.artwork.id, accumulating.artwork.id)
     }
 
     func testDeniedOutdoorLocationStillCompletesWithoutDistanceStep() async throws {

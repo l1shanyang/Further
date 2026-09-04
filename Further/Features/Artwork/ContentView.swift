@@ -46,15 +46,19 @@ struct AppRootView: View {
         case .loading:
             ProgressView()
                 .accessibilityIdentifier("root.loading")
-        case let .cycleSelection(isCreating):
-            ArtworkCycleSelectionView(isCreating: isCreating) { cycle in
-                Task { await model.createArtwork(cycle: cycle) }
-            }
+        case let .cycleSelection(selection):
+            ArtworkCycleSelectionView(
+                state: selection,
+                onConfirm: { cycle in Task { await model.createArtwork(cycle: cycle) } },
+                onCancel: model.cancelNextArtworkSelection
+            )
         case let .currentArtwork(state):
             CurrentArtworkView(
                 state: state,
                 onStartRun: model.beginRunPreparation,
-                onLookback: { Task { await model.showLookback() } }
+                onStartNextArtwork: model.beginNextArtwork,
+                onLookback: { Task { await model.showLookback() } },
+                onCollection: { Task { await model.showCollection() } }
             )
         case let .run(state):
             RunFlowView(
@@ -89,6 +93,12 @@ struct AppRootView: View {
                 onSelectRecord: { id in Task { await model.selectLookbackRecord(id) } },
                 onBack: model.backFromLookback
             )
+        case let .collection(state):
+            CollectionView(
+                state: state,
+                onSelectArtwork: model.selectCollectedArtwork,
+                onBack: model.backFromCollection
+            )
         case .blocked:
             ContentUnavailableView {
                 Label(AppText.dataUnavailableTitle, systemImage: "externaldrive.badge.exclamationmark")
@@ -111,8 +121,9 @@ struct AppRootView: View {
 }
 
 private struct ArtworkCycleSelectionView: View {
-    let isCreating: Bool
+    let state: ArtworkCycleSelectionState
     let onConfirm: (ArtworkCycle) -> Void
+    let onCancel: () -> Void
 
     @State private var selection = ArtworkCycleOption.oneMonth
 
@@ -143,7 +154,7 @@ private struct ArtworkCycleSelectionView: View {
                 } label: {
                     HStack {
                         Spacer()
-                        if isCreating {
+                        if state.isCreating {
                             ProgressView()
                         } else {
                             Text(AppText.beginArtwork)
@@ -153,10 +164,17 @@ private struct ArtworkCycleSelectionView: View {
                     .frame(minHeight: 48)
                 }
                 .buttonStyle(.borderedProminent)
-                .disabled(isCreating)
+                .disabled(state.isCreating)
                 .accessibilityIdentifier("cycle.confirm")
             }
             .padding(24)
+        }
+        .toolbar {
+            if case .nextArtwork = state.context {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(AppText.back, action: onCancel)
+                }
+            }
         }
         .navigationBarBackButtonHidden()
         .accessibilityIdentifier("cycle.selection")
@@ -194,7 +212,9 @@ private struct ArtworkCycleSelectionView: View {
 private struct CurrentArtworkView: View {
     let state: CurrentArtworkViewState
     let onStartRun: () -> Void
+    let onStartNextArtwork: () -> Void
     let onLookback: () -> Void
+    let onCollection: () -> Void
 
     var body: some View {
         ScrollView {
@@ -218,7 +238,12 @@ private struct CurrentArtworkView: View {
                         .foregroundStyle(.secondary)
                 }
 
-                if state.presentation.phase != .completed {
+                if state.presentation.phase == .completed {
+                    Button(AppText.startNextArtwork, action: onStartNextArtwork)
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.large)
+                        .accessibilityIdentifier("artwork.start-next")
+                } else {
                     Button(AppText.prepareRun, action: onStartRun)
                         .buttonStyle(.borderedProminent)
                         .controlSize(.large)
@@ -228,6 +253,10 @@ private struct CurrentArtworkView: View {
                 Button(AppText.lookback, action: onLookback)
                     .buttonStyle(.bordered)
                     .accessibilityIdentifier("artwork.lookback")
+
+                Button(AppText.collection, action: onCollection)
+                    .buttonStyle(.bordered)
+                    .accessibilityIdentifier("artwork.collection")
             }
             .padding(24)
         }
@@ -261,7 +290,7 @@ private struct CurrentArtworkView: View {
     }
 }
 
-private struct BasicArtworkView: View {
+struct BasicArtworkView: View {
     let description: BasicArtworkDescription
 
     var body: some View {

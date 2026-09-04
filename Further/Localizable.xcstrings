@@ -663,6 +663,13 @@
       }
     },
     "action.back" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Back" } } } },
+    "artwork.next.start" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Start the next artwork" } } } },
+    "collection.artwork.cycle" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Cycle" } } } },
+    "collection.artwork.period" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Period" } } } },
+    "collection.artwork.run-count" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Runs" } } } },
+    "collection.empty.message" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "A completed artwork appears here after you begin the next one." } } } },
+    "collection.empty.title" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "No collected artworks yet" } } } },
+    "collection.title" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Collection" } } } },
     "lookback.empty.message" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Runs that have become part of your artwork will appear here." } } } },
     "lookback.empty.title" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "No runs yet" } } } },
     "lookback.title" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Look back" } } } },

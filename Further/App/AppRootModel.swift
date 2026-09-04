@@ -13,13 +13,24 @@ struct CurrentArtworkViewState: Equatable, Sendable {
     }
 }
 
+enum ArtworkCycleSelectionContext: Equatable, Sendable {
+    case firstArtwork
+    case nextArtwork(previous: CurrentArtworkViewState)
+}
+
+struct ArtworkCycleSelectionState: Equatable, Sendable {
+    let context: ArtworkCycleSelectionContext
+    let isCreating: Bool
+}
+
 enum AppRootState: Equatable, Sendable {
     case loading
-    case cycleSelection(isCreating: Bool)
+    case cycleSelection(ArtworkCycleSelectionState)
     case currentArtwork(CurrentArtworkViewState)
     case run(RunFlowViewState)
     case reflection(ReflectionFlowViewState)
     case lookback(LookbackFlowState)
+    case collection(CollectionFlowState)
     case blocked
 }
 
@@ -41,6 +52,8 @@ final class AppRootModel {
     private var artworkBeforeLookback: CurrentArtworkViewState?
     private var lookbackList: LookbackViewState?
     private var selectedLookbackRecordID: ActivityID?
+    private var artworkBeforeCollection: CurrentArtworkViewState?
+    private var collectionList: CollectionViewState?
     private var recorder: RunRecorder?
     private var runUpdateTask: Task<Void, Never>?
     private var reflectionDraftSaveTask: Task<Void, Never>?
@@ -74,7 +87,10 @@ final class AppRootModel {
             recoveryNotice = app.notice
             switch app.route {
             case .artworkSelection:
-                state = .cycleSelection(isCreating: false)
+                state = .cycleSelection(ArtworkCycleSelectionState(
+                    context: .firstArtwork,
+                    isCreating: false
+                ))
             case let .currentArtwork(id):
                 await loadCurrentArtwork(id: id)
             }
@@ -84,33 +100,73 @@ final class AppRootModel {
     }
 
     func createArtwork(cycle: ArtworkCycle) async {
-        guard case .cycleSelection = state, let store else { return }
-        state = .cycleSelection(isCreating: true)
+        guard case let .cycleSelection(selection) = state,
+              !selection.isCreating,
+              let store else { return }
+        let creating = ArtworkCycleSelectionState(
+            context: selection.context,
+            isCreating: true
+        )
+        state = .cycleSelection(creating)
 
         do {
-            let artwork = try await store.createCurrentArtwork(cycle: cycle)
+            let artwork: Artwork
+            switch selection.context {
+            case .firstArtwork:
+                artwork = try await store.createCurrentArtwork(cycle: cycle)
+            case .nextArtwork:
+                artwork = try await store.startNextArtwork(
+                    cycle: cycle,
+                    archivedAt: await timeSource.now()
+                )
+            }
+            guard state == .cycleSelection(creating) else { return }
             state = .currentArtwork(CurrentArtworkViewState(artwork: artwork, records: []))
         } catch {
+            guard state == .cycleSelection(creating) else { return }
             state = .blocked
         }
     }
 
+    func beginNextArtwork() {
+        guard case let .currentArtwork(current) = state,
+              current.presentation.phase == .completed else { return }
+        state = .cycleSelection(ArtworkCycleSelectionState(
+            context: .nextArtwork(previous: current),
+            isCreating: false
+        ))
+    }
+
+    func cancelNextArtworkSelection() {
+        guard case let .cycleSelection(selection) = state,
+              !selection.isCreating,
+              case let .nextArtwork(previous) = selection.context else { return }
+        state = .currentArtwork(previous)
+    }
+
     func refreshCurrentArtwork() async {
         guard case .currentArtwork = state, let store else { return }
+        let expectedState = state
 
         do {
             guard let artwork = try await store.evaluateCurrentArtwork(
                 at: await timeSource.now()
             ) else {
-                state = .cycleSelection(isCreating: false)
+                guard state == expectedState else { return }
+                state = .cycleSelection(ArtworkCycleSelectionState(
+                    context: .firstArtwork,
+                    isCreating: false
+                ))
                 return
             }
             let records = try await store.records(for: artwork.id)
+            guard state == expectedState else { return }
             state = .currentArtwork(CurrentArtworkViewState(
                 artwork: artwork,
                 records: records
             ))
         } catch {
+            guard state == expectedState else { return }
             state = .blocked
         }
     }
@@ -182,6 +238,42 @@ final class AppRootModel {
         }
     }
 
+    func showCollection() async {
+        guard case let .currentArtwork(artwork) = state, let store else { return }
+        let expectedState = state
+        do {
+            let list = CollectionViewState(entries: try await store.artworkCollection())
+            guard state == expectedState else { return }
+            artworkBeforeCollection = artwork
+            collectionList = list
+            state = .collection(.list(list))
+        } catch {
+            guard state == expectedState else { return }
+            state = .blocked
+        }
+    }
+
+    func selectCollectedArtwork(_ id: ArtworkID) {
+        guard case let .collection(.list(list)) = state,
+              let artwork = list.artworks.first(where: { $0.id == id }) else { return }
+        state = .collection(.detail(artwork))
+    }
+
+    func backFromCollection() {
+        switch state {
+        case .collection(.detail):
+            guard let collectionList else { return }
+            state = .collection(.list(collectionList))
+        case .collection(.list):
+            guard let artworkBeforeCollection else { return }
+            state = .currentArtwork(artworkBeforeCollection)
+            self.artworkBeforeCollection = nil
+            collectionList = nil
+        default:
+            break
+        }
+    }
+
     func chooseIndoorRun() {
         guard state == .run(.environmentSelection) else { return }
         state = .run(.readyIndoor(isStarting: false))
@@ -245,6 +337,19 @@ final class AppRootModel {
         do {
             apply(try await recorder.start())
             startRunUpdates()
+        } catch DomainValidationError.artworkNotAcceptingActivities {
+            self.recorder = nil
+            guard let artwork = try? await store.currentArtwork(),
+                  case .completed = artwork.state,
+                  let records = try? await store.records(for: artwork.id) else {
+                state = .blocked
+                return
+            }
+            artworkBeforeRun = nil
+            state = .currentArtwork(CurrentArtworkViewState(
+                artwork: artwork,
+                records: records
+            ))
         } catch {
             state = .blocked
         }

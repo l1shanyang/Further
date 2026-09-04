@@ -18,6 +18,64 @@ final class FurtherStoreTests: XCTestCase {
         XCTAssertEqual(restored, first)
     }
 
+    func testStartingNextArtworkAtomicallyArchivesAndOrdersPreviousArtworks() async throws {
+        let store = try makeStore()
+        let firstID = ArtworkID()
+        _ = try await store.createCurrentArtwork(
+            cycle: .milestone(.tenKilometers),
+            id: firstID
+        )
+        let firstStart = Date(timeIntervalSince1970: 1_800_010_000)
+        try await completeCurrentMilestone(in: store, at: firstStart)
+
+        let secondID = ArtworkID()
+        _ = try await store.startNextArtwork(
+            cycle: .milestone(.tenKilometers),
+            archivedAt: firstStart.addingTimeInterval(100),
+            id: secondID
+        )
+        try await completeCurrentMilestone(in: store, at: firstStart.addingTimeInterval(200))
+
+        let thirdID = ArtworkID()
+        let third = try await store.startNextArtwork(
+            cycle: .time(.oneMonth),
+            archivedAt: firstStart.addingTimeInterval(300),
+            id: thirdID
+        )
+        let collection = try await store.artworkCollection()
+        let current = try await store.currentArtwork()
+
+        XCTAssertEqual(current, third)
+        XCTAssertEqual(collection.map(\.id), [secondID, firstID])
+        XCTAssertTrue(collection.allSatisfy {
+            if case .archived = $0.artwork.state { return true }
+            return false
+        })
+    }
+
+    func testStartingNextArtworkFromIncompleteArtworkRollsBack() async throws {
+        let store = try makeStore()
+        let original = try await store.createCurrentArtwork(cycle: .time(.oneMonth))
+
+        do {
+            _ = try await store.startNextArtwork(
+                cycle: .milestone(.tenKilometers),
+                archivedAt: Date(timeIntervalSince1970: 1_800_020_000)
+            )
+            XCTFail("Expected an incomplete artwork not to be replaced")
+        } catch {
+            XCTAssertEqual(
+                error as? DomainValidationError,
+                .artworkNotAcceptingActivities
+            )
+        }
+
+        let current = try await store.currentArtwork()
+        let collection = try await store.artworkCollection()
+        XCTAssertEqual(current, original)
+        XCTAssertTrue(collection.isEmpty)
+    }
+
     func testFinalRecordRoundTripsWithIndependentRouteSamples() async throws {
         let store = try makeStore()
         _ = try await store.createCurrentArtwork(cycle: .milestone(.tenKilometers))
@@ -221,6 +279,75 @@ final class FurtherStoreTests: XCTestCase {
         }
     }
 
+    func testStartingAfterTimeBoundaryPersistsCompletedArtwork() async throws {
+        let store = try makeStore()
+        _ = try await store.createCurrentArtwork(cycle: .time(.oneMonth))
+        let startedAt = Date(timeIntervalSince1970: 1_800_450_000)
+        let firstAssignment = try await startActivity(in: store, at: startedAt)
+        let firstRecord = try DomainTestSamples.record(
+            assignment: firstAssignment,
+            endedAt: startedAt.addingTimeInterval(60)
+        )
+        let firstDraft = try ReflectionDraft(expression: firstRecord.expression)
+        try await store.beginReflection(record: firstRecord, draft: firstDraft)
+        try await store.lockExpression(firstDraft, activityID: firstAssignment.activityID)
+        _ = try await store.lockReflection(
+            activityID: firstAssignment.activityID,
+            finalizedAt: firstRecord.summary.endedAt
+        )
+        guard let accumulating = try await store.currentArtwork(),
+              case let .accumulating(period) = accumulating.state,
+              let endsAt = period.endsAt else {
+            return XCTFail("Expected an accumulating time artwork")
+        }
+
+        do {
+            _ = try await startActivity(in: store, at: endsAt.addingTimeInterval(1))
+            XCTFail("Expected an expired artwork to reject a new activity")
+        } catch {
+            XCTAssertEqual(
+                error as? DomainValidationError,
+                .artworkNotAcceptingActivities
+            )
+        }
+
+        guard let completed = try await store.currentArtwork(),
+              case .completed = completed.state else {
+            return XCTFail("Expected the time boundary completion to be persisted")
+        }
+        XCTAssertNil(completed.pendingActivityID)
+    }
+
+    func testFinalizingAfterTimeBoundaryCompletesArtwork() async throws {
+        let store = try makeStore()
+        _ = try await store.createCurrentArtwork(cycle: .time(.oneMonth))
+        let startedAt = Date(timeIntervalSince1970: 1_800_475_000)
+        let assignment = try await startActivity(in: store, at: startedAt)
+        guard let accumulating = try await store.currentArtwork(),
+              case let .accumulating(period) = accumulating.state,
+              let endsAt = period.endsAt else {
+            return XCTFail("Expected an accumulating time artwork")
+        }
+        let record = try DomainTestSamples.record(
+            assignment: assignment,
+            endedAt: endsAt.addingTimeInterval(-1)
+        )
+        let draft = try ReflectionDraft(expression: record.expression)
+        try await store.beginReflection(record: record, draft: draft)
+        try await store.lockExpression(draft, activityID: assignment.activityID)
+
+        _ = try await store.lockReflection(
+            activityID: assignment.activityID,
+            finalizedAt: endsAt.addingTimeInterval(1)
+        )
+
+        guard let completed = try await store.currentArtwork(),
+              case let .completed(_, completedAt) = completed.state else {
+            return XCTFail("Expected finalization to re-evaluate the time boundary")
+        }
+        XCTAssertEqual(completedAt, endsAt)
+    }
+
     func testLastSavedDraftCanReturnFromFeelingToSilence() async throws {
         let store = try makeStore()
         _ = try await store.createCurrentArtwork(cycle: .time(.oneMonth))
@@ -306,6 +433,26 @@ final class FurtherStoreTests: XCTestCase {
             timeZone: DomainTestSamples.timeZone,
             origin: DomainTestSamples.origin,
             interruptionExpression: DomainTestSamples.silenceExpression()
+        )
+    }
+
+    private func completeCurrentMilestone(
+        in store: FurtherStore,
+        at startedAt: Date
+    ) async throws {
+        let assignment = try await startActivity(in: store, at: startedAt)
+        let record = try DomainTestSamples.record(
+            assignment: assignment,
+            endedAt: startedAt.addingTimeInterval(60),
+            distance: ActivityDistance(meters: 10_000, source: .manualEntry)
+        )
+        let draft = try ReflectionDraft(expression: record.expression)
+        try await store.beginReflection(record: record, draft: draft)
+        try await store.lockExpression(draft, activityID: assignment.activityID)
+        _ = try await store.lockReflection(
+            activityID: assignment.activityID,
+            manualDistanceMeters: 10_000,
+            finalizedAt: record.summary.endedAt
         )
     }
 }
