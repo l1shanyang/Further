@@ -63,6 +63,19 @@ actor FurtherStore {
         }
     }
 
+    func allRecordIndexEntries() throws -> [ActivityRecordIndexEntry] {
+        try activityModels().compactMap { model in
+            guard try phase(of: model) == .finalized else { return nil }
+            let stored = try requiredStoredRecord(from: model)
+            return ActivityRecordIndexEntry(
+                id: stored.id,
+                lifecycle: stored.lifecycle,
+                summary: stored.summary,
+                expression: stored.expression
+            )
+        }
+    }
+
     func evaluateCurrentArtwork(at date: Date) throws -> Artwork? {
         try transaction {
             guard let model = try singleCurrentArtworkModel() else { return nil }

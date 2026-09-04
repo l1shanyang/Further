@@ -51,7 +51,11 @@ struct AppRootView: View {
                 Task { await model.createArtwork(cycle: cycle) }
             }
         case let .currentArtwork(state):
-            CurrentArtworkView(state: state, onStartRun: model.beginRunPreparation)
+            CurrentArtworkView(
+                state: state,
+                onStartRun: model.beginRunPreparation,
+                onLookback: { Task { await model.showLookback() } }
+            )
         case let .run(state):
             RunFlowView(
                 state: state,
@@ -78,6 +82,12 @@ struct AppRootView: View {
                 onSaveDistance: { Task { await model.saveIndoorDistance() } },
                 onSkipDistance: { Task { await model.skipIndoorDistance() } },
                 onShowArtwork: model.showUpdatedArtwork
+            )
+        case let .lookback(state):
+            LookbackView(
+                state: state,
+                onSelectRecord: { id in Task { await model.selectLookbackRecord(id) } },
+                onBack: model.backFromLookback
             )
         case .blocked:
             ContentUnavailableView {
@@ -184,6 +194,7 @@ private struct ArtworkCycleSelectionView: View {
 private struct CurrentArtworkView: View {
     let state: CurrentArtworkViewState
     let onStartRun: () -> Void
+    let onLookback: () -> Void
 
     var body: some View {
         ScrollView {
@@ -213,6 +224,10 @@ private struct CurrentArtworkView: View {
                         .controlSize(.large)
                         .accessibilityIdentifier("artwork.prepare-run")
                 }
+
+                Button(AppText.lookback, action: onLookback)
+                    .buttonStyle(.bordered)
+                    .accessibilityIdentifier("artwork.lookback")
             }
             .padding(24)
         }

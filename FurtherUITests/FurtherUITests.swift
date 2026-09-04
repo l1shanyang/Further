@@ -95,4 +95,34 @@ final class FurtherUITests: XCTestCase {
         XCTAssertTrue(app.buttons["reflection.view-artwork"].waitForExistence(timeout: 3))
         XCTAssertFalse(app.buttons["reflection.skip-distance"].exists)
     }
+
+    func testFinalizedRunCanBeOpenedFromLookback() {
+        let app = XCUIApplication()
+        app.launchArguments.append("-ui-testing")
+        app.launch()
+
+        XCTAssertTrue(app.scrollViews["cycle.selection"].waitForExistence(timeout: 5))
+        app.buttons["cycle.confirm"].tap()
+        app.buttons["artwork.prepare-run"].tap()
+        app.buttons["run.choose-indoor"].tap()
+        app.buttons["run.start"].tap()
+        XCTAssertTrue(app.buttons["run.end"].waitForExistence(timeout: 6))
+        app.buttons["run.end"].tap()
+        app.buttons["run.confirm-end"].tap()
+        XCTAssertTrue(app.scrollViews["reflection.expression"].waitForExistence(timeout: 3))
+        app.buttons["reflection.keep-silence"].tap()
+        app.buttons["reflection.skip-distance"].tap()
+        app.buttons["reflection.view-artwork"].tap()
+
+        XCTAssertTrue(app.buttons["artwork.lookback"].waitForExistence(timeout: 3))
+        app.buttons["artwork.lookback"].tap()
+        XCTAssertTrue(app.collectionViews["lookback.list"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["No note"].exists)
+        XCTAssertTrue(app.staticTexts["Not recorded"].exists)
+        app.buttons["lookback.record"].tap()
+        XCTAssertTrue(app.scrollViews["record.detail"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["record.route-missing"].exists)
+        XCTAssertFalse(app.buttons["Delete"].exists)
+        XCTAssertFalse(app.buttons["Edit"].exists)
+    }
 }

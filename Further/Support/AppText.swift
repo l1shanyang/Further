@@ -323,6 +323,36 @@ enum AppText {
         defaultValue: "View artwork",
         comment: "Leaves record-entry feedback for the current artwork."
     )
+    static let lookback = String(localized: "lookback.title", defaultValue: "Look back")
+    static let lookbackEmptyTitle = String(
+        localized: "lookback.empty.title",
+        defaultValue: "No runs yet"
+    )
+    static let lookbackEmptyMessage = String(
+        localized: "lookback.empty.message",
+        defaultValue: "Runs that have become part of your artwork will appear here."
+    )
+    static let back = String(localized: "action.back", defaultValue: "Back")
+    static let singleRecord = String(localized: "record.title", defaultValue: "Run")
+    static let recordColor = String(localized: "record.color", defaultValue: "Record color")
+    static let date = String(localized: "record.date", defaultValue: "Date")
+    static let activeTime = String(localized: "record.active-time", defaultValue: "Active time")
+    static let runResult = String(localized: "record.result", defaultValue: "Result")
+    static let endedNormally = String(localized: "record.result.normal", defaultValue: "Ended normally")
+    static let savedAfterTechnicalInterruption = String(
+        localized: "record.result.interruption",
+        defaultValue: "Saved after a technical interruption"
+    )
+    static let technicalInterruption = String(
+        localized: "record.interruption",
+        defaultValue: "Technical interruption"
+    )
+    static let noNote = String(localized: "record.note.missing", defaultValue: "No note")
+    static let route = String(localized: "record.route", defaultValue: "Route")
+    static let routeNotRecorded = String(
+        localized: "record.route.missing",
+        defaultValue: "Route not recorded"
+    )
 
     static func feelingColor(_ number: Int) -> String {
         String.localizedStringWithFormat(

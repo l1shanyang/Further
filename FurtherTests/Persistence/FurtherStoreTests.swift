@@ -95,6 +95,24 @@ final class FurtherStoreTests: XCTestCase {
         XCTAssertNil(recovery.currentArtwork?.pendingActivityID)
     }
 
+    func testRecordIndexIncludesTechnicalInterruptionsAndExcludesUnfinishedActivities() async throws {
+        let store = try makeStore()
+        _ = try await store.createCurrentArtwork(cycle: .time(.oneMonth))
+        let startedAt = Date(timeIntervalSince1970: 1_800_150_000)
+        let interrupted = try await startActivity(in: store, at: startedAt)
+
+        _ = try await store.recoverForBootstrap(at: startedAt.addingTimeInterval(30))
+        _ = try await startActivity(in: store, at: startedAt.addingTimeInterval(60))
+
+        let records = try await store.allRecordIndexEntries()
+
+        XCTAssertEqual(records.map(\.id), [interrupted.activityID])
+        XCTAssertEqual(
+            records.first?.lifecycle,
+            .technicalInterruption(.appTermination)
+        )
+    }
+
     func testBootstrapLocksLastReliableReflectionDraft() async throws {
         let store = try makeStore()
         _ = try await store.createCurrentArtwork(cycle: .milestone(.tenKilometers))

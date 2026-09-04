@@ -51,6 +51,11 @@
 		I10000000000000000000002 /* LocationRouteAccumulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = I20000000000000000000002 /* LocationRouteAccumulator.swift */; };
 		I10000000000000000000003 /* CoreLocationSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = I20000000000000000000003 /* CoreLocationSource.swift */; };
 		I10000000000000000000004 /* LocationRouteAccumulatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = I20000000000000000000004 /* LocationRouteAccumulatorTests.swift */; };
+		J10000000000000000000001 /* LookbackState.swift in Sources */ = {isa = PBXBuildFile; fileRef = J20000000000000000000001 /* LookbackState.swift */; };
+		J10000000000000000000002 /* LookbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = J20000000000000000000002 /* LookbackView.swift */; };
+		J10000000000000000000003 /* ActivityRouteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = J20000000000000000000003 /* ActivityRouteView.swift */; };
+		J10000000000000000000004 /* LookbackStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = J20000000000000000000004 /* LookbackStateTests.swift */; };
+		J10000000000000000000005 /* ActivityRecordIndexEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = J20000000000000000000005 /* ActivityRecordIndexEntry.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -119,6 +124,11 @@
 		I20000000000000000000003 /* CoreLocationSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreLocationSource.swift; sourceTree = "<group>"; };
 		I20000000000000000000004 /* LocationRouteAccumulatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationRouteAccumulatorTests.swift; sourceTree = "<group>"; };
 		I20000000000000000000005 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		J20000000000000000000001 /* LookbackState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LookbackState.swift; sourceTree = "<group>"; };
+		J20000000000000000000002 /* LookbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LookbackView.swift; sourceTree = "<group>"; };
+		J20000000000000000000003 /* ActivityRouteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityRouteView.swift; sourceTree = "<group>"; };
+		J20000000000000000000004 /* LookbackStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LookbackStateTests.swift; sourceTree = "<group>"; };
+		J20000000000000000000005 /* ActivityRecordIndexEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityRecordIndexEntry.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -180,6 +190,7 @@
 				F70000000000000000000001 /* Artwork */,
 				G70000000000000000000001 /* Run */,
 				H70000000000000000000001 /* Reflection */,
+				J70000000000000000000001 /* Lookback */,
 				D70000000000000000000001 /* Domain */,
 				E70000000000000000000002 /* Persistence */,
 			);
@@ -219,6 +230,7 @@
 				D20000000000000000000007 /* TimeSource.swift */,
 				E20000000000000000000001 /* ActivityCheckpoint.swift */,
 				E20000000000000000000002 /* ReflectionDraft.swift */,
+				J20000000000000000000005 /* ActivityRecordIndexEntry.swift */,
 			);
 			path = Domain;
 			sourceTree = "<group>";
@@ -280,6 +292,8 @@
 		B70000000000000000000008 /* Lookback */ = {
 			isa = PBXGroup;
 			children = (
+				J20000000000000000000001 /* LookbackState.swift */,
+				J20000000000000000000002 /* LookbackView.swift */,
 			);
 			path = Lookback;
 			sourceTree = "<group>";
@@ -334,6 +348,7 @@
 			isa = PBXGroup;
 			children = (
 				B20000000000000000000002 /* AppText.swift */,
+				J20000000000000000000003 /* ActivityRouteView.swift */,
 			);
 			path = Support;
 			sourceTree = "<group>";
@@ -398,6 +413,14 @@
 				H20000000000000000000003 /* ReflectionFlowTests.swift */,
 			);
 			path = Reflection;
+			sourceTree = "<group>";
+		};
+		J70000000000000000000001 /* Lookback */ = {
+			isa = PBXGroup;
+			children = (
+				J20000000000000000000004 /* LookbackStateTests.swift */,
+			);
+			path = Lookback;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -565,6 +588,10 @@
 				I10000000000000000000001 /* LocationSource.swift in Sources */,
 				I10000000000000000000002 /* LocationRouteAccumulator.swift in Sources */,
 				I10000000000000000000003 /* CoreLocationSource.swift in Sources */,
+				J10000000000000000000001 /* LookbackState.swift in Sources */,
+				J10000000000000000000002 /* LookbackView.swift in Sources */,
+				J10000000000000000000003 /* ActivityRouteView.swift in Sources */,
+				J10000000000000000000005 /* ActivityRecordIndexEntry.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -585,6 +612,7 @@
 				G10000000000000000000004 /* RunRecorderTests.swift in Sources */,
 				H10000000000000000000003 /* ReflectionFlowTests.swift in Sources */,
 				I10000000000000000000004 /* LocationRouteAccumulatorTests.swift in Sources */,
+				J10000000000000000000004 /* LookbackStateTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

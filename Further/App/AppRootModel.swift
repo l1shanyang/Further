@@ -19,6 +19,7 @@ enum AppRootState: Equatable, Sendable {
     case currentArtwork(CurrentArtworkViewState)
     case run(RunFlowViewState)
     case reflection(ReflectionFlowViewState)
+    case lookback(LookbackFlowState)
     case blocked
 }
 
@@ -37,6 +38,9 @@ final class AppRootModel {
     private var store: FurtherStore?
     private var isStarting = false
     private var artworkBeforeRun: CurrentArtworkViewState?
+    private var artworkBeforeLookback: CurrentArtworkViewState?
+    private var lookbackList: LookbackViewState?
+    private var selectedLookbackRecordID: ActivityID?
     private var recorder: RunRecorder?
     private var runUpdateTask: Task<Void, Never>?
     private var reflectionDraftSaveTask: Task<Void, Never>?
@@ -116,6 +120,66 @@ final class AppRootModel {
               artwork.presentation.phase != .completed else { return }
         artworkBeforeRun = artwork
         state = .run(.environmentSelection)
+    }
+
+    func showLookback() async {
+        guard case let .currentArtwork(artwork) = state, let store else { return }
+        let expectedState = state
+        do {
+            let list = LookbackViewState(entries: try await store.allRecordIndexEntries())
+            guard state == expectedState else { return }
+            artworkBeforeLookback = artwork
+            lookbackList = list
+            state = .lookback(.list(list))
+        } catch {
+            guard state == expectedState else { return }
+            state = .blocked
+        }
+    }
+
+    func selectLookbackRecord(_ id: ActivityID) async {
+        guard case let .lookback(.list(list)) = state,
+              list.sections
+                .flatMap(\.records)
+                .contains(where: { $0.id == id }),
+              let store,
+              selectedLookbackRecordID == nil else { return }
+        let expectedState = state
+        selectedLookbackRecordID = id
+        defer {
+            if selectedLookbackRecordID == id {
+                selectedLookbackRecordID = nil
+            }
+        }
+        do {
+            guard let record = try await store.activityRecord(id: id),
+                  state == expectedState,
+                  selectedLookbackRecordID == id else {
+                guard state == expectedState else { return }
+                state = .blocked
+                return
+            }
+            state = .lookback(.detail(record))
+        } catch {
+            guard state == expectedState, selectedLookbackRecordID == id else { return }
+            state = .blocked
+        }
+    }
+
+    func backFromLookback() {
+        switch state {
+        case .lookback(.detail):
+            guard let lookbackList else { return }
+            state = .lookback(.list(lookbackList))
+        case .lookback(.list):
+            guard let artworkBeforeLookback else { return }
+            state = .currentArtwork(artworkBeforeLookback)
+            self.artworkBeforeLookback = nil
+            lookbackList = nil
+            selectedLookbackRecordID = nil
+        default:
+            break
+        }
     }
 
     func chooseIndoorRun() {

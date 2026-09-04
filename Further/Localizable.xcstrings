@@ -662,6 +662,21 @@
         }
       }
     },
+    "action.back" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Back" } } } },
+    "lookback.empty.message" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Runs that have become part of your artwork will appear here." } } } },
+    "lookback.empty.title" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "No runs yet" } } } },
+    "lookback.title" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Look back" } } } },
+    "record.active-time" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Active time" } } } },
+    "record.color" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Record color" } } } },
+    "record.date" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Date" } } } },
+    "record.interruption" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Technical interruption" } } } },
+    "record.note.missing" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "No note" } } } },
+    "record.result" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Result" } } } },
+    "record.result.interruption" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Saved after a technical interruption" } } } },
+    "record.result.normal" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Ended normally" } } } },
+    "record.route" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Route" } } } },
+    "record.route.missing" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Route not recorded" } } } },
+    "record.title" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Run" } } } },
     "unit.kilometers" : {
       "comment" : "Abbreviated kilometer unit.",
       "extractionState" : "extracted_with_value",
