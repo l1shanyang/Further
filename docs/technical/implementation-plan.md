@@ -245,6 +245,10 @@ HealthKit 数据模型、系统授权、外部写入和幂等。
 
 > 状态：已完成并提交；真机验收待按 `device-acceptance-checklist.md` 执行
 
+> 说明：本阶段记录的是 MVP 工程基线。2026-09 视觉重置后，第一正式版本的视觉验收只
+> 覆盖浅色外观与系统标准字号；深色视觉和辅助功能大字号专项版式已延期，见
+> `docs/product/interface-visual-system.md`。
+
 ### 范围
 
 - Dynamic Type、VoiceOver 和 Reduce Motion。
