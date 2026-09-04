@@ -1,6 +1,17 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "action.back" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Back"
+          }
+        }
+      }
+    },
     "action.cancel" : {
       "comment" : "Generic cancel action.",
       "extractionState" : "extracted_with_value",
@@ -112,12 +123,26 @@
     "artwork.canvas.no-marks" : {
       "comment" : "VoiceOver value for a blank artwork.",
       "extractionState" : "manual",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "No marks yet" } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No marks yet"
+          }
+        }
+      }
     },
     "artwork.canvas.one-mark" : {
       "comment" : "VoiceOver value for an artwork with one run mark.",
       "extractionState" : "manual",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "1 mark" } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 mark"
+          }
+        }
+      }
     },
     "artwork.completed.title" : {
       "comment" : "Title for a completed current artwork.",
@@ -127,6 +152,83 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "This artwork is complete"
+          }
+        }
+      }
+    },
+    "artwork.next.start" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Start the next artwork"
+          }
+        }
+      }
+    },
+    "collection.artwork.cycle" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Cycle"
+          }
+        }
+      }
+    },
+    "collection.artwork.period" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Period"
+          }
+        }
+      }
+    },
+    "collection.artwork.run-count" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Runs"
+          }
+        }
+      }
+    },
+    "collection.empty.message" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "A completed artwork appears here after you begin the next one."
+          }
+        }
+      }
+    },
+    "collection.empty.title" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No collected artworks yet"
+          }
+        }
+      }
+    },
+    "collection.title" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Collection"
           }
         }
       }
@@ -287,6 +389,172 @@
         }
       }
     },
+    "lookback.empty.message" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Runs that have become part of your artwork will appear here."
+          }
+        }
+      }
+    },
+    "lookback.empty.title" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No runs yet"
+          }
+        }
+      }
+    },
+    "lookback.title" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Look back"
+          }
+        }
+      }
+    },
+    "record.active-time" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Active time"
+          }
+        }
+      }
+    },
+    "record.color" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Record color"
+          }
+        }
+      }
+    },
+    "record.color.silence" : {
+      "comment" : "Neutral VoiceOver label for a record that kept a silence expression.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Silent record color"
+          }
+        }
+      }
+    },
+    "record.date" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Date"
+          }
+        }
+      }
+    },
+    "record.interruption" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Technical interruption"
+          }
+        }
+      }
+    },
+    "record.note.missing" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "No note"
+          }
+        }
+      }
+    },
+    "record.result" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Result"
+          }
+        }
+      }
+    },
+    "record.result.interruption" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Saved after a technical interruption"
+          }
+        }
+      }
+    },
+    "record.result.normal" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Ended normally"
+          }
+        }
+      }
+    },
+    "record.route" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Route"
+          }
+        }
+      }
+    },
+    "record.route.missing" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Route not recorded"
+          }
+        }
+      }
+    },
+    "record.title" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Run"
+          }
+        }
+      }
+    },
     "recovery.interrupted-run" : {
       "comment" : "Message after an interrupted run is finalized on startup.",
       "extractionState" : "manual",
@@ -326,87 +594,206 @@
     "reflection.artwork.completed" : {
       "comment" : "Feedback when the newly added record completes the artwork.",
       "extractionState" : "extracted_with_value",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "This mark completed the artwork." } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "This mark completed the artwork."
+          }
+        }
+      }
     },
     "reflection.artwork.mark-count" : {
       "comment" : "Record-entry feedback with the current number of artwork marks.",
       "extractionState" : "extracted_with_value",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Your artwork now holds %lld marks." } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your artwork now holds %lld marks."
+          }
+        }
+      }
     },
     "reflection.artwork.title" : {
       "comment" : "Causal feedback after the finalized record enters its artwork.",
       "extractionState" : "extracted_with_value",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "This run is now part of your artwork." } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "This run is now part of your artwork."
+          }
+        }
+      }
     },
     "reflection.artwork.view" : {
       "comment" : "Leaves record-entry feedback for the current artwork.",
       "extractionState" : "extracted_with_value",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "View artwork" } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "View artwork"
+          }
+        }
+      }
     },
     "reflection.color.accessibility" : {
       "comment" : "Neutral numbered accessibility label for an unlabeled feeling color.",
       "extractionState" : "extracted_with_value",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Feeling color %lld" } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Feeling color %lld"
+          }
+        }
+      }
     },
     "reflection.distance.invalid" : {
       "comment" : "Validation message for manual indoor distance.",
       "extractionState" : "extracted_with_value",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Enter a distance greater than zero." } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Enter a distance greater than zero."
+          }
+        }
+      }
     },
     "reflection.distance.message" : {
       "comment" : "Explanation for manual indoor distance.",
       "extractionState" : "extracted_with_value",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Enter the distance shown by your treadmill or indoor equipment." } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Enter the distance shown by your treadmill or indoor equipment."
+          }
+        }
+      }
     },
     "reflection.distance.placeholder" : {
       "comment" : "Example value for indoor distance input.",
       "extractionState" : "extracted_with_value",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "5.00" } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "5.00"
+          }
+        }
+      }
     },
     "reflection.distance.save" : {
       "comment" : "Saves the manual indoor distance and completes the record.",
       "extractionState" : "extracted_with_value",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Save distance" } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Save distance"
+          }
+        }
+      }
     },
     "reflection.distance.skip" : {
       "comment" : "Completes an indoor record while leaving distance unknown.",
       "extractionState" : "extracted_with_value",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Skip distance" } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Skip distance"
+          }
+        }
+      }
     },
     "reflection.distance.title" : {
       "comment" : "Title for optional indoor manual distance entry.",
       "extractionState" : "extracted_with_value",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Add indoor distance?" } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Add indoor distance?"
+          }
+        }
+      }
     },
     "reflection.expression.finish" : {
       "comment" : "Locks the current color and note selection.",
       "extractionState" : "extracted_with_value",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Finish expression" } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Finish expression"
+          }
+        }
+      }
     },
     "reflection.expression.message" : {
       "comment" : "Explanation for the reflection choices.",
       "extractionState" : "extracted_with_value",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Choose a color, add a short note, or keep this run silent." } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Choose a color, add a short note, or keep this run silent."
+          }
+        }
+      }
     },
     "reflection.expression.silence" : {
       "comment" : "Completes reflection with a silence expression.",
       "extractionState" : "extracted_with_value",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Keep this run silent" } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Keep this run silent"
+          }
+        }
+      }
     },
     "reflection.expression.title" : {
       "comment" : "Title for the post-run feeling reflection.",
       "extractionState" : "extracted_with_value",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "How did it feel?" } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "How did it feel?"
+          }
+        }
+      }
     },
     "reflection.note.placeholder" : {
       "comment" : "Placeholder for the optional reflection note.",
       "extractionState" : "extracted_with_value",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "A detail you want to remember" } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "A detail you want to remember"
+          }
+        }
+      }
     },
     "reflection.note.title" : {
       "comment" : "Label for the optional reflection note.",
       "extractionState" : "extracted_with_value",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Short note" } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Short note"
+          }
+        }
+      }
     },
     "run.countdown.message" : {
       "comment" : "Message shown during the non-cancellable countdown.",
@@ -512,6 +899,30 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Indoor running works without location or route tracking."
+          }
+        }
+      }
+    },
+    "run.environment.outdoor" : {
+      "comment" : "Outdoor running environment option.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Outdoor run"
+          }
+        }
+      }
+    },
+    "run.environment.outdoor.location-unavailable" : {
+      "comment" : "Non-blocking explanation when outdoor location cannot be recorded.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Location is unavailable. You can still run; route and distance may be missing."
           }
         }
       }
@@ -624,30 +1035,6 @@
         }
       }
     },
-    "run.environment.outdoor" : {
-      "comment" : "Outdoor running environment option.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Outdoor run"
-          }
-        }
-      }
-    },
-    "run.environment.outdoor.location-unavailable" : {
-      "comment" : "Non-blocking explanation when outdoor location cannot be recorded.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Location is unavailable. You can still run; route and distance may be missing."
-          }
-        }
-      }
-    },
     "run.tracking.active" : {
       "comment" : "Active running state label.",
       "extractionState" : "extracted_with_value",
@@ -672,45 +1059,138 @@
         }
       }
     },
-    "action.back" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Back" } } } },
-    "artwork.next.start" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Start the next artwork" } } } },
-    "collection.artwork.cycle" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Cycle" } } } },
-    "collection.artwork.period" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Period" } } } },
-    "collection.artwork.run-count" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Runs" } } } },
-    "collection.empty.message" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "A completed artwork appears here after you begin the next one." } } } },
-    "collection.empty.title" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "No collected artworks yet" } } } },
-    "collection.title" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Collection" } } } },
-    "lookback.empty.message" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Runs that have become part of your artwork will appear here." } } } },
-    "lookback.empty.title" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "No runs yet" } } } },
-    "lookback.title" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Look back" } } } },
-    "record.active-time" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Active time" } } } },
-    "record.color" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Record color" } } } },
-    "record.color.silence" : {
-      "comment" : "Neutral VoiceOver label for a record that kept a silence expression.",
-      "extractionState" : "manual",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Silent record color" } } }
+    "settings.distance-unit" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Distance unit"
+          }
+        }
+      }
     },
-    "record.date" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Date" } } } },
-    "record.interruption" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Technical interruption" } } } },
-    "record.note.missing" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "No note" } } } },
-    "record.result" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Result" } } } },
-    "record.result.interruption" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Saved after a technical interruption" } } } },
-    "record.result.normal" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Ended normally" } } } },
-    "record.route" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Route" } } } },
-    "record.route.missing" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Route not recorded" } } } },
-    "record.title" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Run" } } } },
-    "settings.distance-unit" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Distance unit" } } } },
-    "settings.distance-unit.kilometers" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Kilometers" } } } },
-    "settings.distance-unit.miles" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Miles" } } } },
-    "settings.health" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Health" } } } },
-    "settings.health.request" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Allow Health access" } } } },
-    "settings.location" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Location" } } } },
-    "settings.open-system" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Open System Settings" } } } },
-    "settings.permission.allowed" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Allowed" } } } },
-    "settings.permission.denied" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Denied" } } } },
-    "settings.permission.not-requested" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Not requested" } } } },
-    "settings.permission.unavailable" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Unavailable" } } } },
-    "settings.permissions" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Permissions" } } } },
+    "settings.distance-unit.kilometers" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Kilometers"
+          }
+        }
+      }
+    },
+    "settings.distance-unit.miles" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Miles"
+          }
+        }
+      }
+    },
+    "settings.health" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Health"
+          }
+        }
+      }
+    },
+    "settings.health.request" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Allow Health access"
+          }
+        }
+      }
+    },
+    "settings.location" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Location"
+          }
+        }
+      }
+    },
+    "settings.open-system" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Open System Settings"
+          }
+        }
+      }
+    },
+    "settings.permission.allowed" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Allowed"
+          }
+        }
+      }
+    },
+    "settings.permission.denied" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Denied"
+          }
+        }
+      }
+    },
+    "settings.permission.not-requested" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Not requested"
+          }
+        }
+      }
+    },
+    "settings.permission.unavailable" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Unavailable"
+          }
+        }
+      }
+    },
+    "settings.permissions" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Permissions"
+          }
+        }
+      }
+    },
     "settings.permissions.degradation" : {
       "comment" : "Explains that denied system permissions do not endanger local run data.",
       "extractionState" : "manual",
@@ -723,13 +1203,40 @@
         }
       }
     },
-    "settings.title" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Settings" } } } },
+    "settings.title" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Settings"
+          }
+        }
+      }
+    },
     "unit.kilometers" : {
       "comment" : "Abbreviated kilometer unit.",
       "extractionState" : "extracted_with_value",
-      "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "km" } } }
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "km"
+          }
+        }
+      }
     },
-    "unit.miles" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "mi" } } } }
+    "unit.miles" : {
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "mi"
+          }
+        }
+      }
+    }
   },
   "version" : "1.0"
 }
