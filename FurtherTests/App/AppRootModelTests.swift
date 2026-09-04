@@ -391,6 +391,35 @@ final class AppRootModelTests: XCTestCase {
         XCTAssertTrue(record.routeSamples.isEmpty)
         XCTAssertEqual(artwork.records, [record])
     }
+
+    func testRunEnvironmentCanChangeBeforeStarting() async throws {
+        let container = try FurtherModelContainer.inMemory()
+        let source = ModelContainerSource { container }
+        let timeSource = ControlledTimeSource(
+            now: Date(timeIntervalSince1970: 1_810_700_000)
+        )
+        let model = AppRootModel(
+            bootstrap: AppBootstrap(containerSource: source, timeSource: timeSource),
+            timeSource: timeSource,
+            locationSource: UnavailableLocationSource(authorization: .denied),
+            activityOrigin: DomainTestSamples.origin
+        )
+        await model.start()
+        await model.createArtwork(cycle: .time(.oneMonth))
+        model.beginRunPreparation()
+
+        model.chooseIndoorRun()
+        XCTAssertEqual(model.state, .run(.readyIndoor(isStarting: false)))
+
+        await model.chooseOutdoorRun()
+        XCTAssertEqual(
+            model.state,
+            .run(.readyOutdoor(authorization: .denied, isStarting: false))
+        )
+
+        model.chooseIndoorRun()
+        XCTAssertEqual(model.state, .run(.readyIndoor(isStarting: false)))
+    }
 }
 
 private actor SuspendingTimeSource: TimeSource {

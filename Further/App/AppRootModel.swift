@@ -331,14 +331,19 @@ final class AppRootModel {
     }
 
     func chooseIndoorRun() {
-        guard state == .run(.environmentSelection) else { return }
+        guard case let .run(runState) = state,
+              runState.canCancelPreparation else { return }
+        if case .readyIndoor = runState { return }
         state = .run(.readyIndoor(isStarting: false))
     }
 
     func chooseOutdoorRun() async {
-        guard state == .run(.environmentSelection) else { return }
+        guard case let .run(runState) = state,
+              runState.canCancelPreparation else { return }
+        if case .readyOutdoor = runState { return }
+        let expectedState = state
         let authorization = await locationSource.requestAuthorization()
-        guard state == .run(.environmentSelection) else { return }
+        guard state == expectedState else { return }
         state = .run(.readyOutdoor(authorization: authorization, isStarting: false))
     }
 

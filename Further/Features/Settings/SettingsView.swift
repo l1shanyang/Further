@@ -2,92 +2,150 @@ import SwiftUI
 import UIKit
 
 struct SettingsView: View {
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-
     let state: SettingsViewState
     let onSelectDistanceUnit: (DistanceUnit) -> Void
     let onRequestHealthAuthorization: () -> Void
     let onBack: () -> Void
 
     var body: some View {
-        Form {
-            Section(AppText.distanceUnit) {
-                Picker(AppText.distanceUnit, selection: distanceBinding) {
-                    ForEach(DistanceUnit.allCases, id: \.self) { unit in
-                        Text(unit.title).tag(unit)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 0) {
+                FurtherTopBar(title: AppText.settings, onBack: onBack)
+
+                Text(AppText.settings)
+                    .font(.title2.weight(.medium))
+                    .padding(.top, 18)
+
+                sectionTitle(AppText.distanceUnit)
+                VStack(spacing: 0) {
+                    quietRule
+                    HStack(spacing: 16) {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(AppText.displayUnit)
+                            Text(AppText.distanceUnitMessage)
+                                .font(.footnote)
+                                .foregroundStyle(FurtherPalette.secondaryText)
+                        }
+                        Spacer(minLength: 8)
+                        HStack(spacing: 6) {
+                            ForEach(DistanceUnit.allCases, id: \.self) { unit in
+                                Button(unit.title) { onSelectDistanceUnit(unit) }
+                                    .font(.footnote)
+                                    .frame(minWidth: 52, minHeight: 44)
+                                    .background(
+                                        state.distanceUnit == unit
+                                            ? FurtherPalette.primaryText
+                                            : Color.clear,
+                                        in: RoundedRectangle(cornerRadius: 9, style: .continuous)
+                                    )
+                                    .foregroundStyle(
+                                        state.distanceUnit == unit
+                                            ? FurtherPalette.background
+                                            : FurtherPalette.primaryText
+                                    )
+                                    .overlay {
+                                        RoundedRectangle(cornerRadius: 9, style: .continuous)
+                                            .stroke(
+                                                state.distanceUnit == unit
+                                                    ? FurtherPalette.primaryText
+                                                    : FurtherPalette.quietBorder
+                                            )
+                                    }
+                                    .accessibilityAddTraits(
+                                        state.distanceUnit == unit ? .isSelected : []
+                                    )
+                            }
+                        }
+                        .accessibilityIdentifier("settings.distance-unit")
                     }
-                }
-                .pickerStyle(.segmented)
-                .accessibilityIdentifier("settings.distance-unit")
-            }
-
-            Section {
-                permissionRow(
-                    title: AppText.location,
-                    state: locationDescription,
-                    accessibilityIdentifier: "settings.location-status"
-                )
-                permissionRow(
-                    title: AppText.health,
-                    state: healthDescription,
-                    accessibilityIdentifier: "settings.health-status"
-                )
-
-                if state.healthAuthorization == .notDetermined,
-                   state.canRequestHealthAuthorization {
-                    Button(AppText.allowHealthAccess, action: onRequestHealthAuthorization)
-                        .disabled(state.isRequestingHealthAuthorization)
-                        .accessibilityIdentifier("settings.request-health")
+                    .padding(.vertical, 10)
+                    quietRule
                 }
 
-                Link(destination: URL(string: UIApplication.openSettingsURLString)!) {
-                    Label(AppText.openSystemSettings, systemImage: "gear")
+                sectionTitle(AppText.permissions)
+                VStack(spacing: 0) {
+                    quietRule
+                    permissionRow(
+                        title: AppText.location,
+                        description: locationDescription,
+                        accessibilityIdentifier: "settings.location-status"
+                    ) {
+                        systemSettingsLink(label: AppText.openSystemSettings)
+                    }
+                    quietRule
+                    permissionRow(
+                        title: AppText.health,
+                        description: healthDescription,
+                        accessibilityIdentifier: "settings.health-status"
+                    ) {
+                        if state.healthAuthorization == .notDetermined,
+                           state.canRequestHealthAuthorization {
+                            Button(AppText.allowHealthAccess, action: onRequestHealthAuthorization)
+                                .font(.footnote)
+                                .underline(color: FurtherPalette.quietBorder)
+                                .disabled(state.isRequestingHealthAuthorization)
+                                .accessibilityIdentifier("settings.request-health")
+                        } else {
+                            systemSettingsLink(label: AppText.openSystemSettings)
+                        }
+                    }
+                    quietRule
                 }
-                .accessibilityIdentifier("settings.system-settings")
-            } header: {
-                Text(AppText.permissions)
-            } footer: {
+
                 Text(AppText.permissionsDegradationMessage)
+                    .font(.footnote)
+                    .foregroundStyle(FurtherPalette.secondaryText)
+                    .padding(.top, 18)
             }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 32)
         }
-        .navigationTitle(AppText.settings)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button(AppText.back, action: onBack)
-            }
-        }
-        .navigationBarBackButtonHidden()
         .accessibilityIdentifier("settings.view")
+        .navigationBarBackButtonHidden()
+        .furtherPage()
     }
 
-    private var distanceBinding: Binding<DistanceUnit> {
-        Binding(
-            get: { state.distanceUnit },
-            set: { unit in onSelectDistanceUnit(unit) }
-        )
+    private func sectionTitle(_ title: String) -> some View {
+        Text(title)
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(FurtherPalette.secondaryText)
+            .padding(.top, 27)
+            .padding(.bottom, 8)
     }
 
-    private func permissionRow(
+    private func permissionRow<Action: View>(
         title: String,
-        state: String,
-        accessibilityIdentifier: String
+        description: String,
+        accessibilityIdentifier: String,
+        @ViewBuilder action: () -> Action
     ) -> some View {
-        Group {
-            if dynamicTypeSize.isAccessibilitySize {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(title)
-                    Text(state).foregroundStyle(.secondary)
-                }
-            } else {
-                HStack {
-                    Text(title)
-                    Spacer()
-                    Text(state).foregroundStyle(.secondary)
-                }
+        HStack(spacing: 16) {
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                Text(description)
+                    .font(.footnote)
+                    .foregroundStyle(FurtherPalette.secondaryText)
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier(accessibilityIdentifier)
+            Spacer(minLength: 8)
+            action()
         }
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier(accessibilityIdentifier)
+        .frame(minHeight: 60)
+        .padding(.vertical, 6)
+    }
+
+    private func systemSettingsLink(label: String) -> some View {
+        Link(destination: URL(string: UIApplication.openSettingsURLString)!) {
+            Text(label)
+                .font(.footnote)
+                .underline(color: FurtherPalette.quietBorder)
+        }
+        .accessibilityIdentifier("settings.system-settings")
+    }
+
+    private var quietRule: some View {
+        Rectangle().fill(FurtherPalette.quietBorder).frame(height: 1)
     }
 
     private var locationDescription: String {

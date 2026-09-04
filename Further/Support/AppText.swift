@@ -12,6 +12,21 @@ enum AppText {
         defaultValue: "Choose an artwork cycle.",
         comment: "Title for the first artwork cycle selection page."
     )
+    static let chooseCycleNavigationTitle = String(
+        localized: "cycle.navigation-title",
+        defaultValue: "Choose artwork cycle",
+        comment: "Compact navigation title for artwork cycle selection."
+    )
+    static let chooseFirstCycleTitle = String(
+        localized: "cycle.first.title",
+        defaultValue: "Choose your first artwork",
+        comment: "Page heading for the first artwork cycle."
+    )
+    static let chooseNextCycleTitle = String(
+        localized: "cycle.next.title",
+        defaultValue: "Where will the next artwork begin?",
+        comment: "Page heading when choosing a cycle after a completed artwork."
+    )
     static let chooseCycleMessage = String(
         localized: "cycle.choose.message",
         defaultValue: "A cycle gives this artwork a boundary. It begins with your first run.",
@@ -127,6 +142,11 @@ enum AppText {
         defaultValue: "Prepare to run",
         comment: "Primary action on the current artwork."
     )
+    static let prepareRunAccessibilityLabel = String(
+        localized: "run.prepare.accessibility",
+        defaultValue: "Prepare to start a run",
+        comment: "VoiceOver label for the current artwork's run action."
+    )
     static let chooseRunEnvironment = String(
         localized: "run.environment.title",
         defaultValue: "Where will you run?",
@@ -146,6 +166,16 @@ enum AppText {
         localized: "run.environment.outdoor",
         defaultValue: "Outdoor run",
         comment: "Outdoor running environment option."
+    )
+    static let outdoorRunMessage = String(
+        localized: "run.environment.outdoor.message",
+        defaultValue: "You can still begin if location is unavailable; distance and route may be missing.",
+        comment: "Explanation for the outdoor running option."
+    )
+    static let locationRequestedOnStart = String(
+        localized: "run.environment.location-on-start",
+        defaultValue: "Choosing Outdoor asks for location access only when it is needed.",
+        comment: "Quiet note explaining just-in-time location authorization."
     )
     static let outdoorLocationUnavailable = String(
         localized: "run.environment.outdoor.location-unavailable",
@@ -247,6 +277,11 @@ enum AppText {
         defaultValue: "Choose a color, add a short note, or keep this run silent.",
         comment: "Explanation for the reflection choices."
     )
+    static let feelingColorSection = String(
+        localized: "reflection.color.section",
+        defaultValue: "Feeling color",
+        comment: "Section heading for feeling color selection."
+    )
     static let shortNote = String(
         localized: "reflection.note.title",
         defaultValue: "Short note",
@@ -256,6 +291,16 @@ enum AppText {
         localized: "reflection.note.placeholder",
         defaultValue: "A detail you want to remember",
         comment: "Placeholder for the optional reflection note."
+    )
+    static let shortNoteMessage = String(
+        localized: "reflection.note.message",
+        defaultValue: "Optional. It cannot be added or changed after you leave reflection.",
+        comment: "Explains that a short note is optional and final."
+    )
+    static let draftSaved = String(
+        localized: "reflection.draft.saved",
+        defaultValue: "Your note is saved as you write.",
+        comment: "Status shown after a reflection note is saved."
     )
     static let finishExpression = String(
         localized: "reflection.expression.finish",
@@ -281,6 +326,21 @@ enum AppText {
         localized: "reflection.distance.placeholder",
         defaultValue: "5.00",
         comment: "Example value for indoor distance input."
+    )
+    static let manualDistance = String(
+        localized: "reflection.distance.manual",
+        defaultValue: "Manual distance",
+        comment: "Label for indoor manually entered distance."
+    )
+    static let distanceRemainsUnknown = String(
+        localized: "reflection.distance.unknown",
+        defaultValue: "If left empty, distance remains unknown.",
+        comment: "Explains the empty manual distance state."
+    )
+    static let manualDistanceWillBeSaved = String(
+        localized: "reflection.distance.valid",
+        defaultValue: "This will be saved as a manual distance.",
+        comment: "Explains a valid manual distance value."
     )
     static let kilometers = String(
         localized: "unit.kilometers",
@@ -312,12 +372,22 @@ enum AppText {
         defaultValue: "This mark completed the artwork.",
         comment: "Feedback when the newly added record completes the artwork."
     )
+    static let expressionLocked = String(
+        localized: "reflection.artwork.expression-locked",
+        defaultValue: "This expression is final and will not become something to finish later.",
+        comment: "Confirms that the expression is locked after entering the artwork."
+    )
     static let viewArtwork = String(
         localized: "reflection.artwork.view",
         defaultValue: "View artwork",
         comment: "Leaves record-entry feedback for the current artwork."
     )
     static let lookback = String(localized: "lookback.title", defaultValue: "Look back")
+    static let lookbackMessage = String(
+        localized: "lookback.message",
+        defaultValue: "Find a run and the expression you left with it, arranged by time.",
+        comment: "Introduction to the chronological lookback index."
+    )
     static let lookbackEmptyTitle = String(
         localized: "lookback.empty.title",
         defaultValue: "No runs yet"
@@ -357,6 +427,11 @@ enum AppText {
         defaultValue: "Start the next artwork"
     )
     static let collection = String(localized: "collection.title", defaultValue: "Collection")
+    static let collectionMessage = String(
+        localized: "collection.message",
+        defaultValue: "Look back at completed artworks in the order they became part of your collection.",
+        comment: "Introduction to the completed artwork collection."
+    )
     static let collectionEmptyTitle = String(
         localized: "collection.empty.title",
         defaultValue: "No collected artworks yet"
@@ -373,6 +448,11 @@ enum AppText {
         localized: "collection.artwork.period",
         defaultValue: "Period"
     )
+    static let completed = String(
+        localized: "artwork.completed.label",
+        defaultValue: "Completed",
+        comment: "Brief state label for a completed artwork."
+    )
     static let runCount = String(
         localized: "collection.artwork.run-count",
         defaultValue: "Runs"
@@ -381,6 +461,16 @@ enum AppText {
     static let distanceUnit = String(
         localized: "settings.distance-unit",
         defaultValue: "Distance unit"
+    )
+    static let displayUnit = String(
+        localized: "settings.distance-unit.display",
+        defaultValue: "Display unit",
+        comment: "Label for the selected distance display unit."
+    )
+    static let distanceUnitMessage = String(
+        localized: "settings.distance-unit.message",
+        defaultValue: "Only changes how saved facts are displayed.",
+        comment: "Clarifies that changing units does not modify saved facts."
     )
     static let kilometersTitle = String(
         localized: "settings.distance-unit.kilometers",

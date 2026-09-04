@@ -14,13 +14,13 @@ struct ActivityRouteView: View {
             Map(initialPosition: .region(Self.region(for: segments))) {
                 ForEach(Array(segments.enumerated()), id: \.offset) { _, segment in
                     MapPolyline(coordinates: segment)
-                        .stroke(.blue, lineWidth: 4)
+                        .stroke(FurtherPalette.primaryText, lineWidth: 3)
                 }
             }
             .mapStyle(.standard(elevation: .flat))
             .allowsHitTesting(false)
-            .frame(height: 180)
-            .clipShape(RoundedRectangle(cornerRadius: 18))
+            .frame(height: 190)
+            .overlay { Rectangle().stroke(FurtherPalette.quietBorder) }
             .accessibilityIdentifier("record.route")
         }
     }

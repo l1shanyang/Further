@@ -1,102 +1,107 @@
 import SwiftUI
 
 struct CollectionView: View {
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-
     let state: CollectionFlowState
     let distanceUnit: DistanceUnit
     let onSelectArtwork: (ArtworkID) -> Void
     let onBack: () -> Void
 
     var body: some View {
-        switch state {
-        case let .list(list):
-            listView(list)
-        case let .detail(artwork):
-            detailView(artwork)
-        }
-    }
-
-    private func listView(_ state: CollectionViewState) -> some View {
         Group {
-            if state.artworks.isEmpty {
-                ContentUnavailableView(
-                    AppText.collectionEmptyTitle,
-                    systemImage: "square.stack.3d.up.slash",
-                    description: Text(AppText.collectionEmptyMessage)
-                )
-                .accessibilityIdentifier("collection.empty")
-            } else {
-                List(state.artworks) { artwork in
-                    Button { onSelectArtwork(artwork.id) } label: {
-                        VStack(alignment: .leading, spacing: 12) {
-                            BasicArtworkView(description: artwork.presentation)
-                                .frame(height: 180)
-                            Text(cycleDescription(artwork.entry.artwork.cycle))
-                                .foregroundStyle(.primary)
-                            Text(completionDate(artwork.entry.artwork))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("collection.artwork")
-                }
-                .accessibilityIdentifier("collection.list")
-            }
-        }
-        .navigationTitle(AppText.collection)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button(AppText.back, action: onBack)
+            switch state {
+            case let .list(list): listView(list)
+            case let .detail(artwork): detailView(artwork)
             }
         }
         .navigationBarBackButtonHidden()
+        .furtherPage()
+    }
+
+    private func listView(_ state: CollectionViewState) -> some View {
+        VStack(spacing: 0) {
+            FurtherTopBar(title: AppText.collection, onBack: onBack)
+                .padding(.horizontal, 20)
+
+            if state.artworks.isEmpty {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text(AppText.collectionEmptyTitle)
+                            .font(.title2.weight(.medium))
+                        Text(AppText.collectionEmptyMessage)
+                            .foregroundStyle(FurtherPalette.secondaryText)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 510, alignment: .leading)
+                    .padding(.horizontal, 20)
+                }
+                .accessibilityIdentifier("collection.empty")
+            } else {
+                List {
+                    Section {
+                        VStack(alignment: .leading, spacing: 11) {
+                            Text(AppText.collection)
+                                .font(.title2.weight(.medium))
+                            Text(AppText.collectionMessage)
+                                .foregroundStyle(FurtherPalette.secondaryText)
+                        }
+                        .listRowInsets(EdgeInsets(top: 18, leading: 20, bottom: 24, trailing: 20))
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(FurtherPalette.background)
+                    }
+
+                    ForEach(state.artworks) { artwork in
+                        Button { onSelectArtwork(artwork.id) } label: {
+                            HStack(alignment: .top, spacing: 16) {
+                                BasicArtworkView(description: artwork.presentation)
+                                    .frame(width: 92, height: 126)
+
+                                VStack(alignment: .leading, spacing: 5) {
+                                    Text(cycleDescription(artwork.entry.artwork.cycle))
+                                        .font(.body.weight(.medium))
+                                        .foregroundStyle(FurtherPalette.primaryText)
+                                    Text(completionDate(artwork.entry.artwork))
+                                        .font(.footnote)
+                                        .foregroundStyle(FurtherPalette.secondaryText)
+                                }
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical, 13)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
+                        .listRowBackground(FurtherPalette.background)
+                        .listRowSeparatorTint(FurtherPalette.quietBorder)
+                        .accessibilityIdentifier("collection.artwork")
+                    }
+                }
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+                .accessibilityIdentifier("collection.list")
+            }
+        }
     }
 
     private func detailView(_ state: CollectedArtworkViewState) -> some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(alignment: .leading, spacing: 0) {
+                FurtherTopBar(title: AppText.completedArtworkTitle, onBack: onBack)
+
                 BasicArtworkView(description: state.presentation)
-                    .aspectRatio(0.82, contentMode: .fit)
+                    .aspectRatio(335.0 / 460.0, contentMode: .fit)
+                    .padding(.top, 14)
 
-                VStack(alignment: .leading, spacing: 14) {
-                    fact(AppText.artworkCycle, cycleDescription(state.entry.artwork.cycle))
-                    fact(AppText.artworkPeriod, periodDescription(state.entry.artwork))
-                    fact(AppText.runCount, String(state.entry.records.count))
-                    fact(AppText.activeTime, formatDuration(totalActiveTime(state.entry)))
-                    fact(AppText.distance, formatDistance(totalDistance(state.entry)))
-                }
-                .foregroundStyle(.secondary)
+                Text(cycleDescription(state.entry.artwork.cycle))
+                    .font(.title2.weight(.medium))
+                    .padding(.top, 20)
+
+                Text(periodDescription(state.entry.artwork))
+                    .foregroundStyle(FurtherPalette.secondaryText)
+                    .padding(.top, 7)
             }
-            .padding(24)
+            .padding(.horizontal, 20)
+            .padding(.bottom, 32)
         }
-        .navigationTitle(AppText.completedArtworkTitle)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button(AppText.back, action: onBack)
-            }
-        }
-        .navigationBarBackButtonHidden()
         .accessibilityIdentifier("collection.detail")
-    }
-
-    private func fact(_ title: String, _ value: String) -> some View {
-        Group {
-            if dynamicTypeSize.isAccessibilitySize {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(title)
-                    Text(value)
-                }
-            } else {
-                HStack(alignment: .firstTextBaseline) {
-                    Text(title)
-                    Spacer()
-                    Text(value).multilineTextAlignment(.trailing)
-                }
-            }
-        }
-        .accessibilityElement(children: .combine)
     }
 
     private func cycleDescription(_ cycle: ArtworkCycle) -> String {
@@ -127,7 +132,7 @@ struct CollectionView: View {
             period.endsAt ?? completedAt,
             timeZoneIdentifier: period.startTimeZoneIdentifier
         )
-        return "\(start) – \(end)"
+        return "\(start) – \(end) · \(AppText.completed)"
     }
 
     private func formatDate(_ date: Date, timeZoneIdentifier: String) -> String {
@@ -136,29 +141,5 @@ struct CollectionView: View {
         formatter.timeStyle = .none
         formatter.timeZone = TimeZone(identifier: timeZoneIdentifier)
         return formatter.string(from: date)
-    }
-
-    private func totalActiveTime(_ entry: ArtworkCollectionEntry) -> TimeInterval {
-        entry.records.reduce(0) { $0 + $1.summary.activeDuration }
-    }
-
-    private func totalDistance(_ entry: ArtworkCollectionEntry) -> Double? {
-        let distances = entry.records.compactMap { $0.summary.distance?.meters }
-        guard distances.count == entry.records.count else { return nil }
-        return distances.reduce(0, +)
-    }
-
-    private func formatDuration(_ duration: TimeInterval) -> String {
-        let seconds = max(0, Int(duration.rounded(.down)))
-        return String(
-            format: "%02d:%02d:%02d",
-            seconds / 3_600,
-            (seconds % 3_600) / 60,
-            seconds % 60
-        )
-    }
-
-    private func formatDistance(_ meters: Double?) -> String {
-        distanceUnit.format(meters: meters)
     }
 }

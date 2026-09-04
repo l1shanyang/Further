@@ -9,64 +9,112 @@ struct LookbackView: View {
     let onBack: () -> Void
 
     var body: some View {
-        switch state {
-        case let .list(list):
-            listView(list)
-        case let .detail(record):
-            detailView(record)
+        Group {
+            switch state {
+            case let .list(list): listView(list)
+            case let .detail(record): detailView(record)
+            }
         }
+        .navigationBarBackButtonHidden()
+        .furtherPage()
     }
 
     private func listView(_ state: LookbackViewState) -> some View {
-        Group {
+        VStack(spacing: 0) {
+            FurtherTopBar(title: AppText.lookback, onBack: onBack)
+                .padding(.horizontal, 20)
+
             if state.sections.isEmpty {
-                ContentUnavailableView(
-                    AppText.lookbackEmptyTitle,
-                    systemImage: "clock.arrow.circlepath",
-                    description: Text(AppText.lookbackEmptyMessage)
-                )
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text(AppText.lookbackEmptyTitle)
+                            .font(.title2.weight(.medium))
+                        Text(AppText.lookbackEmptyMessage)
+                            .foregroundStyle(FurtherPalette.secondaryText)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 510, alignment: .leading)
+                    .padding(.horizontal, 20)
+                }
                 .accessibilityIdentifier("lookback.empty")
             } else {
                 List {
+                    Section {
+                        VStack(alignment: .leading, spacing: 11) {
+                            Text(AppText.lookback)
+                                .font(.title2.weight(.medium))
+                            Text(AppText.lookbackMessage)
+                                .foregroundStyle(FurtherPalette.secondaryText)
+                        }
+                        .listRowInsets(EdgeInsets(top: 18, leading: 20, bottom: 12, trailing: 20))
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(FurtherPalette.background)
+                    }
+
                     ForEach(state.sections) { section in
-                        Section(sectionTitle(section.id)) {
+                        Section {
                             ForEach(section.records) { row in
                                 Button { onSelectRecord(row.id) } label: {
                                     recordRow(row.entry)
                                 }
                                 .buttonStyle(.plain)
+                                .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
+                                .listRowBackground(FurtherPalette.background)
+                                .listRowSeparatorTint(FurtherPalette.quietBorder)
                                 .accessibilityIdentifier("lookback.record")
                             }
+                        } header: {
+                            Text(sectionTitle(section.id))
+                                .font(.footnote)
+                                .foregroundStyle(FurtherPalette.secondaryText)
+                                .textCase(nil)
                         }
                     }
                 }
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
                 .accessibilityIdentifier("lookback.list")
             }
         }
-        .navigationTitle(AppText.lookback)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button(AppText.back, action: onBack)
-            }
-        }
-        .navigationBarBackButtonHidden()
     }
 
     private func detailView(_ record: SharedActivityRecordV1) -> some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                Circle()
-                    .fill(Color(record.expression.recordColor))
-                    .frame(width: 76, height: 76)
-                    .accessibilityLabel(recordColorAccessibilityLabel(record.expression))
+            VStack(alignment: .leading, spacing: 0) {
+                FurtherTopBar(title: AppText.singleRecord, onBack: onBack)
 
-                if let note = record.expression.note {
-                    Text(note)
-                        .font(.title2)
-                        .accessibilityIdentifier("record.note")
+                Rectangle()
+                    .fill(Color(record.expression.recordColor))
+                    .frame(maxWidth: .infinity)
+                    .aspectRatio(331.0 / 148.0, contentMode: .fit)
+                    .overlay {
+                        Rectangle().stroke(FurtherPalette.quietBorder)
+                    }
+                    .accessibilityLabel(recordColorAccessibilityLabel(record.expression))
+                    .padding(.top, 12)
+
+                Text(record.expression.note ?? AppText.noNote)
+                    .font(.title2)
+                    .foregroundStyle(
+                        record.expression.note == nil
+                            ? FurtherPalette.secondaryText
+                            : FurtherPalette.primaryText
+                    )
+                    .padding(.vertical, 27)
+                    .accessibilityIdentifier("record.note")
+
+                if !record.lifecycle.isNormalEnd {
+                    Text(AppText.savedAfterTechnicalInterruption)
+                        .font(.footnote)
+                        .foregroundStyle(FurtherPalette.secondaryText)
+                        .padding(.vertical, 13)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .overlay(alignment: .top) { quietRule }
+                        .overlay(alignment: .bottom) { quietRule }
+                        .padding(.bottom, 22)
                 }
 
-                VStack(alignment: .leading, spacing: 14) {
+                VStack(spacing: 0) {
+                    quietRule
                     fact(AppText.date, localDate(record))
                     fact(AppText.activeTime, formatDuration(record.summary.activeDuration))
                     fact(AppText.distance, formatDistance(record.summary.distance))
@@ -74,77 +122,88 @@ struct LookbackView: View {
                         AppText.runResult,
                         record.lifecycle.isNormalEnd
                             ? AppText.endedNormally
-                            : AppText.savedAfterTechnicalInterruption
+                            : AppText.technicalInterruption
                     )
                 }
 
                 Text(AppText.route)
-                    .font(.headline)
+                    .font(.footnote)
+                    .foregroundStyle(FurtherPalette.secondaryText)
+                    .padding(.top, 26)
+                    .padding(.bottom, 8)
+
                 if ActivityRouteView.hasDrawableRoute(record) {
                     ActivityRouteView(record: record)
                 } else {
                     Text(AppText.routeNotRecorded)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(FurtherPalette.secondaryText)
+                        .padding(.vertical, 18)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .overlay(alignment: .top) { quietRule }
                         .accessibilityIdentifier("record.route-missing")
                 }
             }
-            .padding(24)
+            .padding(.horizontal, 20)
+            .padding(.bottom, 32)
         }
-        .navigationTitle(AppText.singleRecord)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button(AppText.back, action: onBack)
-            }
-        }
-        .navigationBarBackButtonHidden()
         .accessibilityIdentifier("record.detail")
     }
 
     private func recordRow(_ entry: ActivityRecordIndexEntry) -> some View {
-        HStack(spacing: 14) {
-            Circle()
+        HStack(spacing: 12) {
+            Rectangle()
                 .fill(Color(entry.expression.recordColor))
-                .frame(width: 34, height: 34)
-            VStack(alignment: .leading, spacing: 4) {
+                .frame(width: 38, height: 38)
+                .overlay { Rectangle().stroke(FurtherPalette.quietBorder) }
+
+            VStack(alignment: .leading, spacing: 3) {
                 Text(localDate(entry.summary))
-                    .foregroundStyle(.primary)
-                if let note = entry.expression.note {
-                    Text(note).lineLimit(1)
-                } else {
-                    Text(AppText.noNote)
-                        .foregroundStyle(.secondary)
-                }
-                HStack(spacing: 8) {
-                    Text(formatDistance(entry.summary.distance))
-                    Text(formatDuration(entry.summary.activeDuration))
-                    if !entry.lifecycle.isNormalEnd {
-                        Text(AppText.technicalInterruption)
-                    }
-                }
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .accessibilityIdentifier("lookback.record-facts")
+                    .font(.body.weight(.medium))
+                    .foregroundStyle(FurtherPalette.primaryText)
+                Text(entry.expression.note ?? AppText.noNote)
+                    .font(.footnote)
+                    .foregroundStyle(FurtherPalette.secondaryText)
+                    .lineLimit(1)
             }
-            Spacer()
+
+            Spacer(minLength: 8)
+
+            VStack(alignment: .trailing, spacing: 3) {
+                Text(formatDistance(entry.summary.distance))
+                Text(formatDuration(entry.summary.activeDuration))
+            }
+            .font(.caption)
+            .monospacedDigit()
+            .foregroundStyle(FurtherPalette.secondaryText)
+            .accessibilityIdentifier("lookback.record-facts")
         }
+        .frame(minHeight: 84)
+        .contentShape(Rectangle())
     }
 
     private func fact(_ title: String, _ value: String) -> some View {
         Group {
             if dynamicTypeSize.isAccessibilitySize {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(title).foregroundStyle(.secondary)
+                    Text(title).foregroundStyle(FurtherPalette.secondaryText)
                     Text(value)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
             } else {
                 HStack(alignment: .firstTextBaseline) {
-                    Text(title).foregroundStyle(.secondary)
+                    Text(title).foregroundStyle(FurtherPalette.secondaryText)
                     Spacer()
                     Text(value).multilineTextAlignment(.trailing)
                 }
             }
         }
+        .frame(minHeight: 51)
+        .overlay(alignment: .bottom) { quietRule }
         .accessibilityElement(children: .combine)
+    }
+
+    private var quietRule: some View {
+        Rectangle().fill(FurtherPalette.quietBorder).frame(height: 1)
     }
 
     private func sectionTitle(_ key: LookbackMonthKey) -> String {
@@ -170,7 +229,12 @@ struct LookbackView: View {
 
     private func formatDuration(_ duration: TimeInterval) -> String {
         let seconds = max(0, Int(duration.rounded(.down)))
-        return String(format: "%02d:%02d:%02d", seconds / 3_600, (seconds % 3_600) / 60, seconds % 60)
+        return String(
+            format: "%02d:%02d:%02d",
+            seconds / 3_600,
+            (seconds % 3_600) / 60,
+            seconds % 60
+        )
     }
 
     private func formatDistance(_ distance: ActivityDistance?) -> String {
@@ -187,11 +251,5 @@ struct LookbackView: View {
         case .silence:
             return AppText.silenceRecordColor
         }
-    }
-}
-
-private extension Color {
-    init(_ value: RecordColorValue) {
-        self.init(.sRGB, red: value.red, green: value.green, blue: value.blue, opacity: value.opacity)
     }
 }

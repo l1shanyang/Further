@@ -1214,6 +1214,204 @@
         }
       }
     },
+    "artwork.completed.label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Completed"
+          }
+        }
+      }
+    },
+    "collection.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Look back at completed artworks in the order they became part of your collection."
+          }
+        }
+      }
+    },
+    "cycle.first.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose your first artwork"
+          }
+        }
+      }
+    },
+    "cycle.navigation-title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose artwork cycle"
+          }
+        }
+      }
+    },
+    "cycle.next.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Where will the next artwork begin?"
+          }
+        }
+      }
+    },
+    "lookback.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find a run and the expression you left with it, arranged by time."
+          }
+        }
+      }
+    },
+    "reflection.artwork.expression-locked" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This expression is final and will not become something to finish later."
+          }
+        }
+      }
+    },
+    "reflection.color.section" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feeling color"
+          }
+        }
+      }
+    },
+    "reflection.distance.manual" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manual distance"
+          }
+        }
+      }
+    },
+    "reflection.distance.unknown" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If left empty, distance remains unknown."
+          }
+        }
+      }
+    },
+    "reflection.distance.valid" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This will be saved as a manual distance."
+          }
+        }
+      }
+    },
+    "reflection.draft.saved" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your note is saved as you write."
+          }
+        }
+      }
+    },
+    "reflection.note.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optional. It cannot be added or changed after you leave reflection."
+          }
+        }
+      }
+    },
+    "run.environment.location-on-start" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choosing Outdoor asks for location access only when it is needed."
+          }
+        }
+      }
+    },
+    "run.environment.outdoor.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can still begin if location is unavailable; distance and route may be missing."
+          }
+        }
+      }
+    },
+    "run.prepare.accessibility" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prepare to start a run"
+          }
+        }
+      }
+    },
+    "settings.distance-unit.display" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Display unit"
+          }
+        }
+      }
+    },
+    "settings.distance-unit.message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Only changes how saved facts are displayed."
+          }
+        }
+      }
+    },
     "unit.kilometers" : {
       "comment" : "Abbreviated kilometer unit.",
       "extractionState" : "extracted_with_value",

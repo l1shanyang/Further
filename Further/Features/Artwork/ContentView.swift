@@ -1,4 +1,162 @@
 import SwiftUI
+import UIKit
+
+enum FurtherPalette {
+    static let background = adaptive(light: 0xF2F1ED, dark: 0x141414)
+    static let surface = adaptive(light: 0xEAE9E5, dark: 0x1B1B1A)
+    static let raised = adaptive(light: 0xFAF9F6, dark: 0x222220)
+    static let primaryText = adaptive(light: 0x20201F, dark: 0xE8E6E1)
+    static let secondaryText = adaptive(
+        light: 0x66645F,
+        dark: 0xA5A29B,
+        highContrastLight: 0x464540,
+        highContrastDark: 0xC3C0B9
+    )
+    static let quietBorder = adaptive(
+        light: 0xD4D2CC,
+        dark: 0x343330,
+        highContrastLight: 0x7C7871,
+        highContrastDark: 0x7C7871
+    )
+    static let clearBorder = adaptive(light: 0x7C7871, dark: 0x7C7871)
+    static let action = adaptive(light: 0xE5E3DD, dark: 0x272725)
+    static let actionPressed = adaptive(light: 0xDCD9D2, dark: 0x302F2C)
+
+    private static func adaptive(
+        light: UInt32,
+        dark: UInt32,
+        highContrastLight: UInt32? = nil,
+        highContrastDark: UInt32? = nil
+    ) -> Color {
+        Color(uiColor: UIColor { traits in
+            let isDark = traits.userInterfaceStyle == .dark
+            let value = if traits.accessibilityContrast == .high {
+                isDark ? highContrastDark ?? dark : highContrastLight ?? light
+            } else {
+                isDark ? dark : light
+            }
+            return UIColor(hex: value)
+        })
+    }
+}
+
+private extension UIColor {
+    convenience init(hex: UInt32) {
+        self.init(
+            red: CGFloat((hex >> 16) & 0xFF) / 255,
+            green: CGFloat((hex >> 8) & 0xFF) / 255,
+            blue: CGFloat(hex & 0xFF) / 255,
+            alpha: 1
+        )
+    }
+}
+
+struct FurtherPrimaryButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.body.weight(.semibold))
+            .foregroundStyle(isEnabled ? FurtherPalette.primaryText : FurtherPalette.secondaryText)
+            .frame(maxWidth: .infinity, minHeight: 52)
+            .padding(.horizontal, 14)
+            .background(
+                configuration.isPressed ? FurtherPalette.actionPressed : FurtherPalette.action,
+                in: RoundedRectangle(cornerRadius: 14, style: .continuous)
+            )
+            .overlay {
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(isEnabled ? FurtherPalette.clearBorder : FurtherPalette.quietBorder)
+            }
+            .opacity(isEnabled ? 1 : 0.62)
+            .animation(.easeOut(duration: 0.14), value: configuration.isPressed)
+    }
+}
+
+struct FurtherSecondaryButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.body)
+            .foregroundStyle(FurtherPalette.primaryText)
+            .frame(maxWidth: .infinity, minHeight: 48)
+            .contentShape(Rectangle())
+            .background(
+                configuration.isPressed ? FurtherPalette.action.opacity(0.7) : .clear,
+                in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+            )
+            .opacity(isEnabled ? 1 : 0.5)
+    }
+}
+
+struct FurtherBottomActions<Content: View>: View {
+    @ViewBuilder let content: Content
+
+    var body: some View {
+        VStack(spacing: 7) { content }
+            .padding(.horizontal, 20)
+            .padding(.top, 12)
+            .padding(.bottom, 12)
+            .background(FurtherPalette.background)
+            .overlay(alignment: .top) {
+                Rectangle().fill(FurtherPalette.quietBorder).frame(height: 1)
+            }
+    }
+}
+
+struct FurtherTopBar<Trailing: View>: View {
+    let title: String
+    let onBack: (() -> Void)?
+    @ViewBuilder let trailing: Trailing
+
+    init(
+        title: String,
+        onBack: (() -> Void)? = nil,
+        @ViewBuilder trailing: () -> Trailing = { EmptyView() }
+    ) {
+        self.title = title
+        self.onBack = onBack
+        self.trailing = trailing()
+    }
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Group {
+                if let onBack {
+                    Button(action: onBack) {
+                        Label(AppText.back, systemImage: "chevron.left")
+                            .frame(minWidth: 44, minHeight: 44, alignment: .leading)
+                    }
+                    .accessibilityLabel(AppText.back)
+                } else {
+                    Color.clear
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            Text(title)
+                .font(.headline)
+                .foregroundStyle(FurtherPalette.primaryText)
+                .lineLimit(1)
+
+            trailing
+                .frame(maxWidth: .infinity, alignment: .trailing)
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(FurtherPalette.secondaryText)
+        .frame(minHeight: 54)
+    }
+}
+
+extension View {
+    func furtherPage() -> some View {
+        foregroundStyle(FurtherPalette.primaryText)
+            .background(FurtherPalette.background.ignoresSafeArea())
+            .tint(FurtherPalette.primaryText)
+            .toolbar(.hidden, for: .navigationBar)
+    }
+}
 
 struct AppRootView: View {
     @Environment(\.scenePhase) private var scenePhase
@@ -9,43 +167,35 @@ struct AppRootView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            content
-        }
-        .task {
-            await model.start()
-        }
-        .onChange(of: scenePhase) { _, newPhase in
-            switch newPhase {
-            case .active:
-                Task { await model.appBecameActive() }
-            case .background:
-                Task { await model.appDidEnterBackground() }
-            case .inactive:
-                break
-            @unknown default:
-                break
+        NavigationStack { content }
+            .furtherPage()
+            .task { await model.start() }
+            .onChange(of: scenePhase) { _, newPhase in
+                switch newPhase {
+                case .active: Task { await model.appBecameActive() }
+                case .background: Task { await model.appDidEnterBackground() }
+                case .inactive: break
+                @unknown default: break
+                }
             }
-        }
-        .alert(
-            AppText.recoveryNoticeTitle,
-            isPresented: Binding(
-                get: { model.recoveryNotice != nil },
-                set: { if !$0 { model.dismissRecoveryNotice() } }
-            )
-        ) {
-            Button(AppText.ok) { model.dismissRecoveryNotice() }
-        } message: {
-            Text(recoveryNoticeMessage)
-        }
+            .alert(
+                AppText.recoveryNoticeTitle,
+                isPresented: Binding(
+                    get: { model.recoveryNotice != nil },
+                    set: { if !$0 { model.dismissRecoveryNotice() } }
+                )
+            ) {
+                Button(AppText.ok) { model.dismissRecoveryNotice() }
+            } message: {
+                Text(recoveryNoticeMessage)
+            }
     }
 
     @ViewBuilder
     private var content: some View {
         switch model.state {
         case .loading:
-            ProgressView()
-                .accessibilityIdentifier("root.loading")
+            ProgressView().accessibilityIdentifier("root.loading")
         case let .cycleSelection(selection):
             ArtworkCycleSelectionView(
                 state: selection,
@@ -129,10 +279,9 @@ struct AppRootView: View {
 
     private var recoveryNoticeMessage: String {
         guard let notice = model.recoveryNotice else { return "" }
-        if notice.interruptedActivityCount > 0 {
-            return AppText.interruptedRunSaved
-        }
-        return AppText.reflectionSaved
+        return notice.interruptedActivityCount > 0
+            ? AppText.interruptedRunSaved
+            : AppText.reflectionSaved
     }
 }
 
@@ -146,16 +295,20 @@ private struct ArtworkCycleSelectionView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 28) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(AppText.productName)
-                        .font(.headline)
-                    Text(AppText.chooseCycleTitle)
-                        .font(.largeTitle.bold())
+            VStack(alignment: .leading, spacing: 0) {
+                FurtherTopBar(
+                    title: AppText.chooseCycleNavigationTitle,
+                    onBack: state.context.isNextArtwork ? onCancel : nil
+                )
+
+                VStack(alignment: .leading, spacing: 11) {
+                    Text(state.context.isNextArtwork ? AppText.chooseNextCycleTitle : AppText.chooseFirstCycleTitle)
+                        .font(.title2.weight(.medium))
                     Text(AppText.chooseCycleMessage)
                         .font(.body)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(FurtherPalette.secondaryText)
                 }
+                .padding(.top, 18)
 
                 optionSection(
                     title: AppText.timeCycle,
@@ -165,65 +318,67 @@ private struct ArtworkCycleSelectionView: View {
                     title: AppText.milestoneCycle,
                     options: ArtworkCycleOption.allCases.filter { !$0.isTimeCycle }
                 )
-
+            }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 32)
+        }
+        .accessibilityIdentifier("cycle.selection")
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            FurtherBottomActions {
                 Button {
                     onConfirm(selection.cycle)
                 } label: {
-                    HStack {
-                        Spacer()
-                        if state.isCreating {
-                            ProgressView()
-                        } else {
-                            Text(AppText.beginArtwork)
-                        }
-                        Spacer()
-                    }
-                    .frame(minHeight: 48)
+                    if state.isCreating { ProgressView() } else { Text(AppText.beginArtwork) }
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(FurtherPrimaryButtonStyle())
                 .disabled(state.isCreating)
                 .accessibilityIdentifier("cycle.confirm")
             }
-            .padding(24)
-        }
-        .toolbar {
-            if case .nextArtwork = state.context {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button(AppText.back, action: onCancel)
-                }
-            }
         }
         .navigationBarBackButtonHidden()
-        .accessibilityIdentifier("cycle.selection")
+        .furtherPage()
     }
 
     private func optionSection(
         title: String,
         options: [ArtworkCycleOption]
     ) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 0) {
             Text(title)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.secondary)
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(FurtherPalette.secondaryText)
+                .padding(.bottom, 8)
 
+            Divider().overlay(FurtherPalette.quietBorder)
             ForEach(options) { option in
                 Button {
                     selection = option
                 } label: {
-                    HStack {
+                    HStack(spacing: 16) {
                         Text(option.title(distanceUnit: distanceUnit))
                         Spacer()
-                        Image(systemName: selection == option ? "circle.inset.filled" : "circle")
-                            .foregroundStyle(selection == option ? Color.primary : Color.secondary)
+                        if selection == option {
+                            Image(systemName: "checkmark")
+                                .font(.body.weight(.semibold))
+                        }
                     }
+                    .frame(minHeight: 58)
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .padding(.vertical, 9)
                 .accessibilityAddTraits(selection == option ? .isSelected : [])
                 .accessibilityIdentifier("cycle.option.\(option.rawValue)")
+                Divider().overlay(FurtherPalette.quietBorder)
             }
         }
+        .padding(.top, 30)
+    }
+}
+
+private extension ArtworkCycleSelectionContext {
+    var isNextArtwork: Bool {
+        if case .nextArtwork = self { return true }
+        return false
     }
 }
 
@@ -238,54 +393,86 @@ private struct CurrentArtworkView: View {
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 24) {
-                VStack(alignment: .leading, spacing: 5) {
-                    Text(AppText.productName)
-                        .font(.headline)
-                    Text(title)
-                        .font(.largeTitle.bold())
-                    Text(cycleDescription)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 0) {
+                HStack {
+                    Button(action: onLookback) {
+                        Text(AppText.lookback)
+                            .frame(minWidth: 44, minHeight: 44, alignment: .leading)
+                            .contentShape(Rectangle())
+                    }
+                        .accessibilityIdentifier("artwork.lookback")
+                    Spacer()
+                    Button(action: onSettings) {
+                        Image(systemName: "gearshape")
+                            .frame(width: 44, height: 44)
+                    }
+                    .accessibilityLabel(AppText.settings)
+                    .accessibilityIdentifier("artwork.settings")
                 }
+                .buttonStyle(.plain)
+                .foregroundStyle(FurtherPalette.secondaryText)
+                .frame(minHeight: 53)
+
+                Text(title)
+                    .font(.title2.weight(.medium))
+                    .padding(.top, 15)
+
+                HStack(alignment: .firstTextBaseline, spacing: 12) {
+                    Text(cycleDescription)
+                        .font(.footnote)
+                        .foregroundStyle(FurtherPalette.secondaryText)
+                    Spacer()
+                    Button(action: onCollection) {
+                        Text(AppText.collection)
+                            .font(.footnote)
+                            .frame(minHeight: 44)
+                            .contentShape(Rectangle())
+                            .underline(color: FurtherPalette.quietBorder)
+                            .foregroundStyle(FurtherPalette.secondaryText)
+                    }
+                        .accessibilityIdentifier("artwork.collection")
+                }
+                .frame(minHeight: 32)
 
                 BasicArtworkView(description: state.presentation)
-                    .aspectRatio(0.82, contentMode: .fit)
+                    .aspectRatio(335.0 / 460.0, contentMode: .fit)
+                    .padding(.top, 14)
 
-                if state.presentation.phase == .blank {
-                    Text(AppText.blankArtworkMessage)
-                        .font(.body)
-                        .foregroundStyle(.secondary)
-                }
-
-                if state.presentation.phase == .completed {
-                    Button(AppText.startNextArtwork, action: onStartNextArtwork)
-                        .buttonStyle(.borderedProminent)
-                        .controlSize(.large)
-                        .accessibilityIdentifier("artwork.start-next")
-                } else {
-                    Button(AppText.prepareRun, action: onStartRun)
-                        .buttonStyle(.borderedProminent)
-                        .controlSize(.large)
-                        .accessibilityIdentifier("artwork.prepare-run")
-                }
-
-                Button(AppText.lookback, action: onLookback)
-                    .buttonStyle(.bordered)
-                    .accessibilityIdentifier("artwork.lookback")
-
-                Button(AppText.collection, action: onCollection)
-                    .buttonStyle(.bordered)
-                    .accessibilityIdentifier("artwork.collection")
-
-                Button(AppText.settings, action: onSettings)
-                    .buttonStyle(.bordered)
-                    .accessibilityIdentifier("artwork.settings")
+                Text(state.presentation.phase == .blank ? AppText.blankArtworkMessage : " ")
+                    .font(.body)
+                    .foregroundStyle(FurtherPalette.secondaryText)
+                    .padding(.top, 14)
+                    .accessibilityHidden(state.presentation.phase != .blank)
             }
-            .padding(24)
+            .padding(.horizontal, 20)
+            .padding(.bottom, 28)
+        }
+        .accessibilityIdentifier("artwork.current")
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            FurtherBottomActions {
+                Button(
+                    state.presentation.phase == .completed
+                        ? AppText.startNextArtwork
+                        : AppText.prepareRun,
+                    action: state.presentation.phase == .completed
+                        ? onStartNextArtwork
+                        : onStartRun
+                )
+                .buttonStyle(FurtherPrimaryButtonStyle())
+                .accessibilityLabel(
+                    state.presentation.phase == .completed
+                        ? AppText.startNextArtwork
+                        : AppText.prepareRunAccessibilityLabel
+                )
+                .accessibilityIdentifier(
+                    state.presentation.phase == .completed
+                        ? "artwork.start-next"
+                        : "artwork.prepare-run"
+                )
+            }
         }
         .navigationBarBackButtonHidden()
-        .accessibilityIdentifier("artwork.current")
+        .furtherPage()
     }
 
     private var title: String {
@@ -316,10 +503,8 @@ struct BasicArtworkView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                RoundedRectangle(cornerRadius: 28)
-                    .fill(Color.secondary.opacity(0.06))
-                RoundedRectangle(cornerRadius: 28)
-                    .stroke(Color.secondary.opacity(0.14), lineWidth: 1)
+                Rectangle().fill(FurtherPalette.surface)
+                Rectangle().stroke(FurtherPalette.quietBorder, lineWidth: 1)
 
                 ForEach(description.marks) { mark in
                     Circle()
