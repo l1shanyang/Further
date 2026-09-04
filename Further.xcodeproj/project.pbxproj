@@ -385,22 +385,6 @@
 			path = Artwork;
 			sourceTree = "<group>";
 		};
-		N70000000000000000000001 /* Health */ = {
-			isa = PBXGroup;
-			children = (
-				N20000000000000000000001 /* HealthExporterTests.swift */,
-			);
-			path = Health;
-			sourceTree = "<group>";
-		};
-		N70000000000000000000002 /* Settings */ = {
-			isa = PBXGroup;
-			children = (
-				N20000000000000000000002 /* SettingsTests.swift */,
-			);
-			path = Settings;
-			sourceTree = "<group>";
-		};
 		B7000000000000000000000F /* Support */ = {
 			isa = PBXGroup;
 			children = (
@@ -486,6 +470,22 @@
 				K20000000000000000000004 /* CollectionStateTests.swift */,
 			);
 			path = Collection;
+			sourceTree = "<group>";
+		};
+		N70000000000000000000001 /* Health */ = {
+			isa = PBXGroup;
+			children = (
+				N20000000000000000000001 /* HealthExporterTests.swift */,
+			);
+			path = Health;
+			sourceTree = "<group>";
+		};
+		N70000000000000000000002 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				N20000000000000000000002 /* SettingsTests.swift */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -761,11 +761,11 @@
 				CODE_SIGN_ENTITLEMENTS = Further/Further.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = FUDZHCT6A5;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Further/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Further;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_FILE = Further/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -786,11 +786,11 @@
 				CODE_SIGN_ENTITLEMENTS = Further/Further.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = FUDZHCT6A5;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Further/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Further;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_FILE = Further/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
