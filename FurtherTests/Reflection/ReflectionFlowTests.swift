@@ -29,13 +29,18 @@ final class ReflectionFlowTests: XCTestCase {
     }
 
     func testManualDistanceAcceptsDecimalSeparatorsAndRejectsInvalidValues() {
-        XCTAssertEqual(ManualDistanceParser.meters(fromKilometers: "5.25"), 5_250)
-        XCTAssertEqual(ManualDistanceParser.meters(fromKilometers: " 5,25 "), 5_250)
-        XCTAssertNil(ManualDistanceParser.meters(fromKilometers: ""))
-        XCTAssertNil(ManualDistanceParser.meters(fromKilometers: "0"))
-        XCTAssertNil(ManualDistanceParser.meters(fromKilometers: "-2"))
-        XCTAssertNil(ManualDistanceParser.meters(fromKilometers: "five"))
-        XCTAssertNil(ManualDistanceParser.meters(fromKilometers: "1e308"))
+        XCTAssertEqual(ManualDistanceParser.meters(from: "5.25"), 5_250)
+        XCTAssertEqual(ManualDistanceParser.meters(from: " 5,25 "), 5_250)
+        XCTAssertNil(ManualDistanceParser.meters(from: ""))
+        XCTAssertNil(ManualDistanceParser.meters(from: "0"))
+        XCTAssertNil(ManualDistanceParser.meters(from: "-2"))
+        XCTAssertNil(ManualDistanceParser.meters(from: "five"))
+        XCTAssertNil(ManualDistanceParser.meters(from: "1e308"))
+        XCTAssertEqual(
+            try XCTUnwrap(ManualDistanceParser.meters(from: "1", unit: .miles)),
+            1_609.344,
+            accuracy: 0.001
+        )
     }
 
     private func silenceColor() throws -> SilenceColor {

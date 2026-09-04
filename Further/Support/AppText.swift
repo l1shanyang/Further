@@ -378,6 +378,50 @@ enum AppText {
         localized: "collection.artwork.run-count",
         defaultValue: "Runs"
     )
+    static let settings = String(localized: "settings.title", defaultValue: "Settings")
+    static let distanceUnit = String(
+        localized: "settings.distance-unit",
+        defaultValue: "Distance unit"
+    )
+    static let kilometersTitle = String(
+        localized: "settings.distance-unit.kilometers",
+        defaultValue: "Kilometers"
+    )
+    static let milesTitle = String(
+        localized: "settings.distance-unit.miles",
+        defaultValue: "Miles"
+    )
+    static let miles = String(localized: "unit.miles", defaultValue: "mi")
+    static let permissions = String(
+        localized: "settings.permissions",
+        defaultValue: "Permissions"
+    )
+    static let location = String(localized: "settings.location", defaultValue: "Location")
+    static let health = String(localized: "settings.health", defaultValue: "Health")
+    static let permissionNotRequested = String(
+        localized: "settings.permission.not-requested",
+        defaultValue: "Not requested"
+    )
+    static let permissionAllowed = String(
+        localized: "settings.permission.allowed",
+        defaultValue: "Allowed"
+    )
+    static let permissionDenied = String(
+        localized: "settings.permission.denied",
+        defaultValue: "Denied"
+    )
+    static let permissionUnavailable = String(
+        localized: "settings.permission.unavailable",
+        defaultValue: "Unavailable"
+    )
+    static let allowHealthAccess = String(
+        localized: "settings.health.request",
+        defaultValue: "Allow Health access"
+    )
+    static let openSystemSettings = String(
+        localized: "settings.open-system",
+        defaultValue: "Open System Settings"
+    )
 
     static func feelingColor(_ number: Int) -> String {
         String.localizedStringWithFormat(

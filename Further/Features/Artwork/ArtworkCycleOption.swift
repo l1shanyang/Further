@@ -21,14 +21,14 @@ enum ArtworkCycleOption: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
-    var title: String {
+    func title(distanceUnit: DistanceUnit) -> String {
         switch self {
         case .oneMonth: AppText.oneMonth
         case .threeMonths: AppText.threeMonths
         case .oneYear: AppText.oneYear
-        case .tenKilometers: AppText.tenKilometers
-        case .halfMarathon: AppText.halfMarathon
-        case .marathon: AppText.marathon
+        case .tenKilometers: distanceUnit.format(meters: 10_000)
+        case .halfMarathon: distanceUnit.format(meters: 21_097.5)
+        case .marathon: distanceUnit.format(meters: 42_195)
         }
     }
 

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct RunFlowView: View {
     let state: RunFlowViewState
+    let distanceUnit: DistanceUnit
     let isCommandInFlight: Bool
     let onChooseIndoor: () -> Void
     let onChooseOutdoor: () -> Void
@@ -198,8 +199,7 @@ struct RunFlowView: View {
     }
 
     private func formatDistance(_ distance: ActivityDistance?) -> String {
-        guard let distance else { return AppText.notRecorded }
-        return String(format: "%.2f %@", distance.meters / 1_000, AppText.kilometers)
+        distanceUnit.format(meters: distance?.meters)
     }
 }
 

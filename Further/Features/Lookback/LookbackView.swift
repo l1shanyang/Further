@@ -2,6 +2,7 @@ import SwiftUI
 
 struct LookbackView: View {
     let state: LookbackFlowState
+    let distanceUnit: DistanceUnit
     let onSelectRecord: (ActivityID) -> Void
     let onBack: () -> Void
 
@@ -161,8 +162,7 @@ struct LookbackView: View {
     }
 
     private func formatDistance(_ distance: ActivityDistance?) -> String {
-        guard let distance else { return AppText.notRecorded }
-        return String(format: "%.2f %@", distance.meters / 1_000, AppText.kilometers)
+        distanceUnit.format(meters: distance?.meters)
     }
 }
 

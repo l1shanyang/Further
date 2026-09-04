@@ -22,7 +22,7 @@ struct ReflectionExpressionState: Equatable, Sendable {
 
 struct IndoorDistanceState: Equatable, Sendable {
     let activityID: ActivityID
-    var kilometers: String
+    var distanceInput: String
     var showsValidationError: Bool
 }
 
@@ -36,16 +36,16 @@ enum ReflectionFlowViewState: Equatable, Sendable {
 }
 
 enum ManualDistanceParser {
-    static func meters(fromKilometers input: String) -> Double? {
+    static func meters(from input: String, unit: DistanceUnit = .kilometers) -> Double? {
         let normalized = input
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .replacingOccurrences(of: ",", with: ".")
-        guard let kilometers = Double(normalized),
-              kilometers.isFinite,
-              kilometers > 0 else {
+        guard let distance = Double(normalized),
+              distance.isFinite,
+              distance > 0 else {
             return nil
         }
-        let meters = kilometers * 1_000
+        let meters = distance * unit.metersPerUnit
         return meters.isFinite ? meters : nil
     }
 }

@@ -35,6 +35,7 @@
 		E10000000000000000000007 /* AppBootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000007 /* AppBootstrap.swift */; };
 		E10000000000000000000008 /* FurtherStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000008 /* FurtherStoreTests.swift */; };
 		E10000000000000000000009 /* AppBootstrapTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E20000000000000000000009 /* AppBootstrapTests.swift */; };
+		E1000000000000000000000A /* PersistenceSchemaV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2000000000000000000000A /* PersistenceSchemaV2.swift */; };
 		F10000000000000000000001 /* AppRootModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000001 /* AppRootModel.swift */; };
 		F10000000000000000000002 /* BasicArtworkRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000002 /* BasicArtworkRenderer.swift */; };
 		F10000000000000000000003 /* ArtworkCycleOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000003 /* ArtworkCycleOption.swift */; };
@@ -60,6 +61,14 @@
 		K10000000000000000000002 /* CollectionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = K20000000000000000000002 /* CollectionState.swift */; };
 		K10000000000000000000003 /* CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = K20000000000000000000003 /* CollectionView.swift */; };
 		K10000000000000000000004 /* CollectionStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = K20000000000000000000004 /* CollectionStateTests.swift */; };
+		L10000000000000000000001 /* HealthWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = L20000000000000000000001 /* HealthWriter.swift */; };
+		L10000000000000000000002 /* HealthExporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = L20000000000000000000002 /* HealthExporter.swift */; };
+		L10000000000000000000003 /* HealthKitWriter.swift in Sources */ = {isa = PBXBuildFile; fileRef = L20000000000000000000003 /* HealthKitWriter.swift */; };
+		M10000000000000000000001 /* DistanceUnit.swift in Sources */ = {isa = PBXBuildFile; fileRef = M20000000000000000000001 /* DistanceUnit.swift */; };
+		M10000000000000000000002 /* SettingsState.swift in Sources */ = {isa = PBXBuildFile; fileRef = M20000000000000000000002 /* SettingsState.swift */; };
+		M10000000000000000000003 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = M20000000000000000000003 /* SettingsView.swift */; };
+		N10000000000000000000001 /* HealthExporterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = N20000000000000000000001 /* HealthExporterTests.swift */; };
+		N10000000000000000000002 /* SettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = N20000000000000000000002 /* SettingsTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -111,6 +120,7 @@
 		E20000000000000000000007 /* AppBootstrap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBootstrap.swift; sourceTree = "<group>"; };
 		E20000000000000000000008 /* FurtherStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FurtherStoreTests.swift; sourceTree = "<group>"; };
 		E20000000000000000000009 /* AppBootstrapTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBootstrapTests.swift; sourceTree = "<group>"; };
+		E2000000000000000000000A /* PersistenceSchemaV2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceSchemaV2.swift; sourceTree = "<group>"; };
 		F20000000000000000000001 /* AppRootModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRootModel.swift; sourceTree = "<group>"; };
 		F20000000000000000000002 /* BasicArtworkRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasicArtworkRenderer.swift; sourceTree = "<group>"; };
 		F20000000000000000000003 /* ArtworkCycleOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtworkCycleOption.swift; sourceTree = "<group>"; };
@@ -137,6 +147,15 @@
 		K20000000000000000000002 /* CollectionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionState.swift; sourceTree = "<group>"; };
 		K20000000000000000000003 /* CollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionView.swift; sourceTree = "<group>"; };
 		K20000000000000000000004 /* CollectionStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionStateTests.swift; sourceTree = "<group>"; };
+		L20000000000000000000001 /* HealthWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthWriter.swift; sourceTree = "<group>"; };
+		L20000000000000000000002 /* HealthExporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthExporter.swift; sourceTree = "<group>"; };
+		L20000000000000000000003 /* HealthKitWriter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthKitWriter.swift; sourceTree = "<group>"; };
+		L20000000000000000000004 /* Further.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Further.entitlements; sourceTree = "<group>"; };
+		M20000000000000000000001 /* DistanceUnit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceUnit.swift; sourceTree = "<group>"; };
+		M20000000000000000000002 /* SettingsState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsState.swift; sourceTree = "<group>"; };
+		M20000000000000000000003 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		N20000000000000000000001 /* HealthExporterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthExporterTests.swift; sourceTree = "<group>"; };
+		N20000000000000000000002 /* SettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -178,6 +197,7 @@
 			isa = PBXGroup;
 			children = (
 				I20000000000000000000005 /* Info.plist */,
+				L20000000000000000000004 /* Further.entitlements */,
 				B70000000000000000000001 /* App */,
 				B70000000000000000000002 /* Domain */,
 				B70000000000000000000003 /* Persistence */,
@@ -200,6 +220,8 @@
 				H70000000000000000000001 /* Reflection */,
 				J70000000000000000000001 /* Lookback */,
 				K70000000000000000000001 /* Collection */,
+				N70000000000000000000001 /* Health */,
+				N70000000000000000000002 /* Settings */,
 				D70000000000000000000001 /* Domain */,
 				E70000000000000000000002 /* Persistence */,
 			);
@@ -249,6 +271,7 @@
 			isa = PBXGroup;
 			children = (
 				E20000000000000000000003 /* PersistenceSchemaV1.swift */,
+				E2000000000000000000000A /* PersistenceSchemaV2.swift */,
 				E20000000000000000000004 /* FurtherModelContainer.swift */,
 				E20000000000000000000005 /* PersistenceMapper.swift */,
 				E20000000000000000000006 /* FurtherStore.swift */,
@@ -320,6 +343,9 @@
 		B7000000000000000000000A /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				M20000000000000000000001 /* DistanceUnit.swift */,
+				M20000000000000000000002 /* SettingsState.swift */,
+				M20000000000000000000003 /* SettingsView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -344,6 +370,9 @@
 		B7000000000000000000000D /* Health */ = {
 			isa = PBXGroup;
 			children = (
+				L20000000000000000000001 /* HealthWriter.swift */,
+				L20000000000000000000002 /* HealthExporter.swift */,
+				L20000000000000000000003 /* HealthKitWriter.swift */,
 			);
 			path = Health;
 			sourceTree = "<group>";
@@ -354,6 +383,22 @@
 				F20000000000000000000002 /* BasicArtworkRenderer.swift */,
 			);
 			path = Artwork;
+			sourceTree = "<group>";
+		};
+		N70000000000000000000001 /* Health */ = {
+			isa = PBXGroup;
+			children = (
+				N20000000000000000000001 /* HealthExporterTests.swift */,
+			);
+			path = Health;
+			sourceTree = "<group>";
+		};
+		N70000000000000000000002 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				N20000000000000000000002 /* SettingsTests.swift */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 		B7000000000000000000000F /* Support */ = {
@@ -593,6 +638,7 @@
 				E10000000000000000000001 /* ActivityCheckpoint.swift in Sources */,
 				E10000000000000000000002 /* ReflectionDraft.swift in Sources */,
 				E10000000000000000000003 /* PersistenceSchemaV1.swift in Sources */,
+				E1000000000000000000000A /* PersistenceSchemaV2.swift in Sources */,
 				E10000000000000000000004 /* FurtherModelContainer.swift in Sources */,
 				E10000000000000000000005 /* PersistenceMapper.swift in Sources */,
 				E10000000000000000000006 /* FurtherStore.swift in Sources */,
@@ -615,6 +661,12 @@
 				K10000000000000000000001 /* ArtworkCollectionEntry.swift in Sources */,
 				K10000000000000000000002 /* CollectionState.swift in Sources */,
 				K10000000000000000000003 /* CollectionView.swift in Sources */,
+				L10000000000000000000001 /* HealthWriter.swift in Sources */,
+				L10000000000000000000002 /* HealthExporter.swift in Sources */,
+				L10000000000000000000003 /* HealthKitWriter.swift in Sources */,
+				M10000000000000000000001 /* DistanceUnit.swift in Sources */,
+				M10000000000000000000002 /* SettingsState.swift in Sources */,
+				M10000000000000000000003 /* SettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -637,6 +689,8 @@
 				I10000000000000000000004 /* LocationRouteAccumulatorTests.swift in Sources */,
 				J10000000000000000000004 /* LookbackStateTests.swift in Sources */,
 				K10000000000000000000004 /* CollectionStateTests.swift in Sources */,
+				N10000000000000000000001 /* HealthExporterTests.swift in Sources */,
+				N10000000000000000000002 /* SettingsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -704,6 +758,7 @@
 		AC0000000000000000000003 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Further/Further.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";
@@ -728,6 +783,7 @@
 		AC0000000000000000000004 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Further/Further.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = "";

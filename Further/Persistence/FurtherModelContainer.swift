@@ -3,19 +3,19 @@ import SwiftData
 
 enum FurtherModelContainer {
     static func persistent() throws -> ModelContainer {
-        let schema = Schema(versionedSchema: FurtherSchemaV1.self)
+        let schema = Schema(versionedSchema: FurtherSchemaV2.self)
         let configuration = ModelConfiguration("Further", schema: schema)
         return try make(configuration: configuration, schema: schema)
     }
 
     static func persistent(at url: URL) throws -> ModelContainer {
-        let schema = Schema(versionedSchema: FurtherSchemaV1.self)
+        let schema = Schema(versionedSchema: FurtherSchemaV2.self)
         let configuration = ModelConfiguration("Further", schema: schema, url: url)
         return try make(configuration: configuration, schema: schema)
     }
 
     static func inMemory() throws -> ModelContainer {
-        let schema = Schema(versionedSchema: FurtherSchemaV1.self)
+        let schema = Schema(versionedSchema: FurtherSchemaV2.self)
         let configuration = ModelConfiguration(
             "FurtherTests",
             schema: schema,

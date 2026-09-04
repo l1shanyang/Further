@@ -14,6 +14,8 @@ struct AppComposition {
     let containerSource: ModelContainerSource
     let timeSource: any TimeSource
     let locationSource: any LocationSource
+    let healthWriter: any HealthWriter
+    let distanceUnitStore: any DistanceUnitStoring
 
     static func current(arguments: [String] = ProcessInfo.processInfo.arguments) -> AppComposition {
         arguments.contains(uiTestingLaunchArgument) ? .testing() : .production()
@@ -24,7 +26,9 @@ struct AppComposition {
             dataSource: .production,
             containerSource: .production,
             timeSource: SystemTimeSource(),
-            locationSource: CoreLocationSource()
+            locationSource: CoreLocationSource(),
+            healthWriter: HealthKitWriter(),
+            distanceUnitStore: UserDefaultsDistanceUnitStore()
         )
     }
 
@@ -33,7 +37,9 @@ struct AppComposition {
             dataSource: .testing,
             containerSource: .testing,
             timeSource: SystemTimeSource(),
-            locationSource: UnavailableLocationSource()
+            locationSource: UnavailableLocationSource(),
+            healthWriter: UnavailableHealthWriter(),
+            distanceUnitStore: InMemoryDistanceUnitStore()
         )
     }
 
@@ -46,6 +52,8 @@ struct AppComposition {
             bootstrap: bootstrap,
             timeSource: timeSource,
             locationSource: locationSource,
+            healthWriter: healthWriter,
+            distanceUnitStore: distanceUnitStore,
             activityOrigin: activityOrigin
         ))
     }

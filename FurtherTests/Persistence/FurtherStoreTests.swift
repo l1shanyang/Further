@@ -153,6 +153,59 @@ final class FurtherStoreTests: XCTestCase {
         XCTAssertNil(recovery.currentArtwork?.pendingActivityID)
     }
 
+    func testVersionOneStoreMigratesWithoutLosingCurrentArtwork() async throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appending(path: "FurtherMigrationTests-\(UUID().uuidString)", directoryHint: .isDirectory)
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let databaseURL = directory.appending(path: "Further.store")
+        let startedAt = Date(timeIntervalSince1970: 1_799_000_000)
+        var expected = Artwork(cycle: .time(.oneMonth))
+        let assignment = try expected.beginActivity(
+            environment: .indoor,
+            at: startedAt,
+            timeZone: DomainTestSamples.timeZone
+        )
+        let record = try DomainTestSamples.record(
+            assignment: assignment,
+            endedAt: startedAt.addingTimeInterval(60)
+        )
+        try expected.include(record, finalizedAt: record.summary.endedAt)
+
+        do {
+            let schema = Schema(versionedSchema: FurtherSchemaV1.self)
+            let configuration = ModelConfiguration("Further", schema: schema, url: databaseURL)
+            let container = try ModelContainer(for: schema, configurations: [configuration])
+            let context = ModelContext(container)
+            context.insert(FurtherSchemaV1.ArtworkModel(
+                id: expected.id.rawValue,
+                isCurrent: true,
+                snapshotData: try PersistenceCodec.encode(StoredArtworkSnapshot(expected))
+            ))
+            context.insert(FurtherSchemaV1.ActivityModel(
+                id: record.id.rawValue,
+                artworkID: record.artworkID.rawValue,
+                phaseRawValue: StoredActivityPhase.finalized.rawValue,
+                checkpointData: nil,
+                recordData: try PersistenceCodec.encode(StoredActivityRecord(record)),
+                reflectionDraftData: nil
+            ))
+            try context.save()
+        }
+
+        let migrated = try FurtherStore(
+            modelContainer: FurtherModelContainer.persistent(at: databaseURL)
+        )
+
+        let recovery = try await migrated.recoverForBootstrap(at: record.summary.endedAt)
+        let restored = recovery.currentArtwork
+        let exportJobs = try await migrated.healthExportJobs(
+            includeAuthorizationDenied: true
+        )
+        XCTAssertEqual(restored, expected)
+        XCTAssertEqual(exportJobs.map(\.record), [record])
+    }
+
     func testRecordIndexIncludesTechnicalInterruptionsAndExcludesUnfinishedActivities() async throws {
         let store = try makeStore()
         _ = try await store.createCurrentArtwork(cycle: .time(.oneMonth))
@@ -413,10 +466,11 @@ final class FurtherStoreTests: XCTestCase {
         XCTAssertNil(recovery.currentArtwork?.pendingActivityID)
     }
 
-    func testModelSchemaStartsAtVersionOneWithExplicitMigrationPlan() {
+    func testModelSchemaMigratesFromVersionOneToHealthExportVersion() {
         XCTAssertEqual(FurtherSchemaV1.versionIdentifier, Schema.Version(1, 0, 0))
-        XCTAssertEqual(FurtherMigrationPlan.schemas.count, 1)
-        XCTAssertTrue(FurtherMigrationPlan.stages.isEmpty)
+        XCTAssertEqual(FurtherSchemaV2.versionIdentifier, Schema.Version(2, 0, 0))
+        XCTAssertEqual(FurtherMigrationPlan.schemas.count, 2)
+        XCTAssertEqual(FurtherMigrationPlan.stages.count, 1)
     }
 
     private func makeStore() throws -> FurtherStore {

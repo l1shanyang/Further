@@ -162,4 +162,28 @@ final class FurtherUITests: XCTestCase {
         XCTAssertFalse(app.buttons["Delete"].exists)
         XCTAssertFalse(app.buttons["Share"].exists)
     }
+
+    func testSettingsPersistDistanceUnitAndShowPermissionStates() {
+        let app = XCUIApplication()
+        app.launchArguments.append("-ui-testing")
+        app.launch()
+
+        XCTAssertTrue(app.scrollViews["cycle.selection"].waitForExistence(timeout: 5))
+        app.buttons["cycle.confirm"].tap()
+        XCTAssertTrue(app.buttons["artwork.settings"].waitForExistence(timeout: 3))
+        app.buttons["artwork.settings"].tap()
+
+        XCTAssertTrue(
+            app.descendants(matching: .any)["settings.view"].waitForExistence(timeout: 3)
+        )
+        XCTAssertTrue(app.descendants(matching: .any)["settings.location-status"].exists)
+        XCTAssertTrue(app.descendants(matching: .any)["settings.health-status"].exists)
+        app.buttons["Miles"].tap()
+        XCTAssertTrue(app.buttons["Miles"].isSelected)
+
+        app.buttons["Back"].tap()
+        XCTAssertTrue(app.scrollViews["artwork.current"].waitForExistence(timeout: 3))
+        app.buttons["artwork.settings"].tap()
+        XCTAssertTrue(app.buttons["Miles"].isSelected)
+    }
 }

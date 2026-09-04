@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ReflectionFlowView: View {
     let state: ReflectionFlowViewState
+    let distanceUnit: DistanceUnit
     let isCommandInFlight: Bool
     let onSelectColor: (FeelingColor) -> Void
     let onChangeNote: (String) -> Void
@@ -111,14 +112,14 @@ struct ReflectionFlowView: View {
                 TextField(
                     AppText.distancePlaceholder,
                     text: Binding(
-                        get: { distance.kilometers },
+                        get: { distance.distanceInput },
                         set: { value in onChangeDistance(value) }
                     )
                 )
                 .keyboardType(.decimalPad)
                 .textFieldStyle(.roundedBorder)
                 .accessibilityIdentifier("reflection.distance")
-                Text(AppText.kilometers)
+                Text(distanceUnit.symbol)
                     .foregroundStyle(.secondary)
             }
 

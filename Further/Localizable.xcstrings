@@ -684,11 +684,25 @@
     "record.route" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Route" } } } },
     "record.route.missing" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Route not recorded" } } } },
     "record.title" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Run" } } } },
+    "settings.distance-unit" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Distance unit" } } } },
+    "settings.distance-unit.kilometers" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Kilometers" } } } },
+    "settings.distance-unit.miles" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Miles" } } } },
+    "settings.health" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Health" } } } },
+    "settings.health.request" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Allow Health access" } } } },
+    "settings.location" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Location" } } } },
+    "settings.open-system" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Open System Settings" } } } },
+    "settings.permission.allowed" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Allowed" } } } },
+    "settings.permission.denied" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Denied" } } } },
+    "settings.permission.not-requested" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Not requested" } } } },
+    "settings.permission.unavailable" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Unavailable" } } } },
+    "settings.permissions" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Permissions" } } } },
+    "settings.title" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Settings" } } } },
     "unit.kilometers" : {
       "comment" : "Abbreviated kilometer unit.",
       "extractionState" : "extracted_with_value",
       "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "km" } } }
-    }
+    },
+    "unit.miles" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "mi" } } } }
   },
   "version" : "1.0"
 }

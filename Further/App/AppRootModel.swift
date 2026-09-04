@@ -31,6 +31,7 @@ enum AppRootState: Equatable, Sendable {
     case reflection(ReflectionFlowViewState)
     case lookback(LookbackFlowState)
     case collection(CollectionFlowState)
+    case settings(SettingsViewState)
     case blocked
 }
 
@@ -41,10 +42,13 @@ final class AppRootModel {
     private(set) var recoveryNotice: AppBootstrapNotice?
     private(set) var isRunCommandInFlight = false
     private(set) var isReflectionCommandInFlight = false
+    private(set) var distanceUnit: DistanceUnit
 
     private let bootstrap: AppBootstrap
     private let timeSource: any TimeSource
     private let locationSource: any LocationSource
+    private let healthWriter: any HealthWriter
+    private let distanceUnitStore: any DistanceUnitStoring
     private let activityOrigin: ActivityOrigin
     private var store: FurtherStore?
     private var isStarting = false
@@ -54,6 +58,8 @@ final class AppRootModel {
     private var selectedLookbackRecordID: ActivityID?
     private var artworkBeforeCollection: CurrentArtworkViewState?
     private var collectionList: CollectionViewState?
+    private var artworkBeforeSettings: CurrentArtworkViewState?
+    private var healthExporter: HealthExporter?
     private var recorder: RunRecorder?
     private var runUpdateTask: Task<Void, Never>?
     private var reflectionDraftSaveTask: Task<Void, Never>?
@@ -62,6 +68,8 @@ final class AppRootModel {
         bootstrap: AppBootstrap,
         timeSource: any TimeSource,
         locationSource: any LocationSource = UnavailableLocationSource(),
+        healthWriter: any HealthWriter = UnavailableHealthWriter(),
+        distanceUnitStore: any DistanceUnitStoring = InMemoryDistanceUnitStore(),
         activityOrigin: ActivityOrigin = ActivityOrigin(
             productIdentifier: "com.example.Further",
             productVersion: "testing",
@@ -72,6 +80,9 @@ final class AppRootModel {
         self.bootstrap = bootstrap
         self.timeSource = timeSource
         self.locationSource = locationSource
+        self.healthWriter = healthWriter
+        self.distanceUnitStore = distanceUnitStore
+        distanceUnit = distanceUnitStore.distanceUnit
         self.activityOrigin = activityOrigin
     }
 
@@ -84,6 +95,8 @@ final class AppRootModel {
         switch await bootstrap.start() {
         case let .ready(app):
             store = app.store
+            let exporter = HealthExporter(store: app.store, writer: healthWriter)
+            healthExporter = exporter
             recoveryNotice = app.notice
             switch app.route {
             case .artworkSelection:
@@ -94,6 +107,7 @@ final class AppRootModel {
             case let .currentArtwork(id):
                 await loadCurrentArtwork(id: id)
             }
+            await exporter.exportPending(allowAuthorizationRequest: false)
         case .blocked:
             state = .blocked
         }
@@ -272,6 +286,48 @@ final class AppRootModel {
         default:
             break
         }
+    }
+
+    func showSettings() async {
+        guard case let .currentArtwork(artwork) = state,
+              let healthExporter else { return }
+        artworkBeforeSettings = artwork
+        state = .settings(SettingsViewState(
+            distanceUnit: distanceUnit,
+            locationAuthorization: locationSource.currentAuthorization(),
+            healthAuthorization: await healthExporter.authorizationState(),
+            canRequestHealthAuthorization: await healthExporter.hasPendingExports(),
+            isRequestingHealthAuthorization: false
+        ))
+    }
+
+    func selectDistanceUnit(_ unit: DistanceUnit) {
+        guard case var .settings(settings) = state else { return }
+        distanceUnitStore.distanceUnit = unit
+        distanceUnit = unit
+        settings.distanceUnit = unit
+        state = .settings(settings)
+    }
+
+    func requestHealthAuthorization() async {
+        guard case var .settings(settings) = state,
+              settings.canRequestHealthAuthorization,
+              !settings.isRequestingHealthAuthorization,
+              let healthExporter else { return }
+        settings.isRequestingHealthAuthorization = true
+        state = .settings(settings)
+        await healthExporter.exportPending(allowAuthorizationRequest: true)
+        guard case var .settings(current) = state else { return }
+        current.healthAuthorization = await healthExporter.authorizationState()
+        current.canRequestHealthAuthorization = await healthExporter.hasPendingExports()
+        current.isRequestingHealthAuthorization = false
+        state = .settings(current)
+    }
+
+    func backFromSettings() {
+        guard case .settings = state, let artworkBeforeSettings else { return }
+        state = .currentArtwork(artworkBeforeSettings)
+        self.artworkBeforeSettings = nil
     }
 
     func chooseIndoorRun() {
@@ -457,6 +513,17 @@ final class AppRootModel {
             }
         } else if case .currentArtwork = state {
             await refreshCurrentArtwork()
+            await healthExporter?.exportPending(allowAuthorizationRequest: false)
+        } else if case var .settings(settings) = state {
+            settings.locationAuthorization = locationSource.currentAuthorization()
+            let healthAuthorization = await healthExporter?.authorizationState() ?? .unavailable
+            if healthAuthorization == .authorized {
+                await healthExporter?.exportPending(allowAuthorizationRequest: true)
+            }
+            settings.healthAuthorization = healthAuthorization
+            settings.canRequestHealthAuthorization = await healthExporter?.hasPendingExports()
+                ?? false
+            state = .settings(settings)
         }
     }
 
@@ -498,10 +565,10 @@ final class AppRootModel {
         await finishReflectionExpression(keepingSilence: true)
     }
 
-    func updateIndoorDistance(_ kilometers: String) {
+    func updateIndoorDistance(_ input: String) {
         guard case var .reflection(.indoorDistance(distance)) = state,
               !isReflectionCommandInFlight else { return }
-        distance.kilometers = kilometers
+        distance.distanceInput = input
         distance.showsValidationError = false
         state = .reflection(.indoorDistance(distance))
     }
@@ -509,7 +576,10 @@ final class AppRootModel {
     func saveIndoorDistance() async {
         guard case var .reflection(.indoorDistance(distance)) = state,
               !isReflectionCommandInFlight else { return }
-        guard let meters = ManualDistanceParser.meters(fromKilometers: distance.kilometers) else {
+        guard let meters = ManualDistanceParser.meters(
+            from: distance.distanceInput,
+            unit: distanceUnit
+        ) else {
             distance.showsValidationError = true
             state = .reflection(.indoorDistance(distance))
             return
@@ -529,6 +599,11 @@ final class AppRootModel {
         artworkBeforeRun = nil
         recorder = nil
         reflectionDraftSaveTask = nil
+        if let healthExporter {
+            Task {
+                await healthExporter.exportPending(allowAuthorizationRequest: true)
+            }
+        }
     }
 
     func dismissRecoveryNotice() {
@@ -646,7 +721,7 @@ final class AppRootModel {
             if current.environment == .indoor {
                 state = .reflection(.indoorDistance(IndoorDistanceState(
                     activityID: current.activityID,
-                    kilometers: "",
+                    distanceInput: "",
                     showsValidationError: false
                 )))
             } else {

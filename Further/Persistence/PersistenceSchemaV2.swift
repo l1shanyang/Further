@@ -1,12 +1,13 @@
 import Foundation
 import SwiftData
 
-enum FurtherSchemaV1: VersionedSchema {
-    static let versionIdentifier = Schema.Version(1, 0, 0)
+enum FurtherSchemaV2: VersionedSchema {
+    static let versionIdentifier = Schema.Version(2, 0, 0)
     static let models: [any PersistentModel.Type] = [
         ArtworkModel.self,
         ActivityModel.self,
         RouteSampleModel.self,
+        HealthExportModel.self,
     ]
 
     @Model
@@ -63,4 +64,36 @@ enum FurtherSchemaV1: VersionedSchema {
         }
     }
 
+    @Model
+    final class HealthExportModel {
+        @Attribute(.unique) var activityID: UUID
+        var stateRawValue: String
+        var workoutUUID: UUID?
+        var routeUUID: UUID?
+        var attemptCount: Int
+
+        init(
+            activityID: UUID,
+            stateRawValue: String,
+            workoutUUID: UUID? = nil,
+            routeUUID: UUID? = nil,
+            attemptCount: Int = 0
+        ) {
+            self.activityID = activityID
+            self.stateRawValue = stateRawValue
+            self.workoutUUID = workoutUUID
+            self.routeUUID = routeUUID
+            self.attemptCount = attemptCount
+        }
+    }
+}
+
+enum FurtherMigrationPlan: SchemaMigrationPlan {
+    static let schemas: [any VersionedSchema.Type] = [
+        FurtherSchemaV1.self,
+        FurtherSchemaV2.self,
+    ]
+    static let stages: [MigrationStage] = [
+        .lightweight(fromVersion: FurtherSchemaV1.self, toVersion: FurtherSchemaV2.self),
+    ]
 }

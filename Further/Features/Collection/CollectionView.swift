@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CollectionView: View {
     let state: CollectionFlowState
+    let distanceUnit: DistanceUnit
     let onSelectArtwork: (ArtworkID) -> Void
     let onBack: () -> Void
 
@@ -95,11 +96,7 @@ struct CollectionView: View {
             case .oneYear: AppText.oneYear
             }
         case let .milestone(milestone):
-            switch milestone {
-            case .tenKilometers: AppText.tenKilometers
-            case .halfMarathon: AppText.halfMarathon
-            case .marathon: AppText.marathon
-            }
+            distanceUnit.format(meters: milestone.distanceMeters)
         }
     }
 
@@ -150,7 +147,6 @@ struct CollectionView: View {
     }
 
     private func formatDistance(_ meters: Double?) -> String {
-        guard let meters else { return AppText.notRecorded }
-        return String(format: "%.2f %@", meters / 1_000, AppText.kilometers)
+        distanceUnit.format(meters: meters)
     }
 }
