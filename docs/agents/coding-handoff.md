@@ -2,7 +2,9 @@
 
 ## Current phase
 
-阶段 0 至阶段 10 已经完成并提交，首版实现阶段结束。模拟器构建、单元测试和关键 UI 自动化已经通过；后台、锁屏、长路线和 HealthKit 写入仍待按 `docs/technical/device-acceptance-checklist.md` 完成真机验收。
+阶段 0 至阶段 10 已经完成并提交，首版 MVP 功能实现阶段结束，当前基线为 `cecf2d3`。模拟器构建、单元测试和关键 UI 自动化已经通过。2026-09-04 已在 iPhone 13 mini（iOS 26.2）完成安装、签名信任与基础真机运行验证，核心流程暂未发现明显问题。
+
+这次结果属于真机冒烟验证，不替代发布前专项验收。后台、锁屏、60 分钟以上长路线、定位拒绝、进程终止、HealthKit 权限组合与写入幂等、无障碍和显示矩阵仍以 `docs/technical/device-acceptance-checklist.md` 为准。
 
 ## Start here
 
@@ -14,16 +16,17 @@
 4. `docs/product/data-model-and-system-boundaries.md`：确认数据语义与系统权威。
 5. `docs/technical/architecture.md`：确认模块、interface、seam、adapter 和测试策略。
 6. `docs/technical/implementation-plan.md`：只实施当前阶段，不提前进入后续阶段。
+7. 若任务来自新的 UI/美术设计阶段，先读 `docs/agents/ui-design-handoff.md`，不要直接用当前占位界面反推最终设计。
 
 涉及产品动机、信息结构或视觉职责时，再读取对应的 `docs/product/` 文档；涉及难以逆转的决定时，读取相关 `docs/adr/`。
 
 ## Next task
 
-完成首版发布前真机验收，再确定后续产品阶段：
+当前没有待立即实施的 Coding 阶段。下一阶段是独立的 UI、交互与美术设计讨论：
 
-- 在已签名的 iPhone 构建上完成后台、锁屏、长路线、HealthKit 与可访问性验收。
-- 将真机发现的问题作为首版发布阻塞项单独修复并回归，不混入新功能。
-- 真机验收通过后，根据真实使用反馈另行制定首版后的实施计划。
+- 以 `docs/agents/ui-design-handoff.md` 为入口，在不改变已确认产品范围和领域语义的前提下确定作品、收束、跑步、回望、作品集和设置的视觉与交互语言。
+- 先更新产品设计文档并形成可验收的 UI 规格，再另行编写 UI 实施计划；设计讨论期间不直接重写现有 SwiftUI 页面。
+- 发布前仍需完成 `docs/technical/device-acceptance-checklist.md` 的专项真机验收；发现的问题作为首版发布阻塞项单独修复，不混入视觉重构或新功能。
 
 在新的产品计划确认前，不实现编辑、删除、分享、统计比较或跨产品能力。
 
