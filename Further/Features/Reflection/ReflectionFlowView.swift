@@ -1,3 +1,4 @@
+import MapKit
 import SwiftUI
 
 struct ReflectionFlowView: View {
@@ -25,8 +26,8 @@ struct ReflectionFlowView: View {
             expressionView(expression)
         case let .indoorDistance(distance):
             distanceView(distance)
-        case let .enteringArtwork(recordColor, artwork):
-            enteringArtworkView(recordColor: recordColor, artwork: artwork)
+        case let .enteringArtwork(record, artwork):
+            enteringArtworkView(record: record, artwork: artwork)
         }
     }
 
@@ -142,14 +143,14 @@ struct ReflectionFlowView: View {
     }
 
     private func enteringArtworkView(
-        recordColor: RecordColorValue,
+        record: SharedActivityRecordV1,
         artwork: CurrentArtworkViewState
     ) -> some View {
         VStack(spacing: 26) {
             Spacer()
             ZStack {
                 Circle()
-                    .fill(Color(recordColor))
+                    .fill(Color(record.expression.recordColor))
                     .frame(width: 96, height: 96)
                 Image(systemName: "arrow.down")
                     .font(.title.bold())
@@ -165,12 +166,94 @@ struct ReflectionFlowView: View {
             )
             .foregroundStyle(.secondary)
             .multilineTextAlignment(.center)
+            if record.environment == .outdoor {
+                RoutePreview(record: record)
+            }
             Button(AppText.viewArtwork, action: onShowArtwork)
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .accessibilityIdentifier("reflection.view-artwork")
             Spacer()
         }
+    }
+}
+
+private struct RoutePreview: View {
+    let record: SharedActivityRecordV1
+
+    private var coordinates: [CLLocationCoordinate2D] {
+        record.routeSamples.compactMap { sample in
+            guard sample.quality == .accepted else { return nil }
+            return CLLocationCoordinate2D(latitude: sample.latitude, longitude: sample.longitude)
+        }
+    }
+
+    private var segments: [[CLLocationCoordinate2D]] {
+        var result: [[CLLocationCoordinate2D]] = []
+        var current: [CLLocationCoordinate2D] = []
+        var previousDate: Date?
+
+        for sample in record.routeSamples {
+            guard sample.quality == .accepted else {
+                if current.count >= 2 { result.append(current) }
+                current = []
+                previousDate = nil
+                continue
+            }
+
+            let crossesGap = previousDate.map {
+                sample.measuredAt.timeIntervalSince($0)
+                    > LocationRouteAccumulator.maximumSegmentGap
+            } ?? false
+            let crossesPause = previousDate.map { previous in
+                record.events.contains {
+                    $0.occurredAt > previous && $0.occurredAt <= sample.measuredAt
+                }
+            } ?? false
+            if crossesGap || crossesPause {
+                if current.count >= 2 { result.append(current) }
+                current = []
+            }
+            current.append(CLLocationCoordinate2D(
+                latitude: sample.latitude,
+                longitude: sample.longitude
+            ))
+            previousDate = sample.measuredAt
+        }
+        if current.count >= 2 { result.append(current) }
+        return result
+    }
+
+    var body: some View {
+        if !segments.isEmpty {
+            Map(initialPosition: .region(region)) {
+                ForEach(Array(segments.enumerated()), id: \.offset) { _, segment in
+                    MapPolyline(coordinates: segment)
+                        .stroke(.blue, lineWidth: 4)
+                }
+            }
+            .mapStyle(.standard(elevation: .flat))
+            .allowsHitTesting(false)
+            .frame(height: 180)
+            .clipShape(RoundedRectangle(cornerRadius: 18))
+            .accessibilityIdentifier("reflection.route")
+        }
+    }
+
+    private var region: MKCoordinateRegion {
+        let latitudes = coordinates.map(\.latitude)
+        let longitudes = coordinates.map(\.longitude)
+        let center = CLLocationCoordinate2D(
+            latitude: (latitudes.min()! + latitudes.max()!) / 2,
+            longitude: (longitudes.min()! + longitudes.max()!) / 2
+        )
+        return MKCoordinateRegion(
+            center: center,
+            span: MKCoordinateSpan(
+                latitudeDelta: max(0.002, (latitudes.max()! - latitudes.min()!) * 1.4),
+                longitudeDelta: max(0.002, (longitudes.max()! - longitudes.min()!) * 1.4)
+            )
+        )
     }
 }
 

@@ -93,7 +93,7 @@ final class AppRootModelTests: XCTestCase {
 
         XCTAssertEqual(
             model.state,
-            .run(.tracking(.running(activeDuration: 50)))
+            .run(.tracking(.running(activeDuration: 50, distance: nil)))
         )
     }
 
@@ -196,10 +196,10 @@ final class AppRootModelTests: XCTestCase {
         model.updateIndoorDistance("10")
         await model.saveIndoorDistance()
 
-        guard case let .reflection(.enteringArtwork(recordColor, artwork)) = model.state else {
+        guard case let .reflection(.enteringArtwork(record, artwork)) = model.state else {
             return XCTFail("Expected causal artwork-entry feedback")
         }
-        XCTAssertEqual(recordColor, color.value)
+        XCTAssertEqual(record.expression.recordColor, color.value)
         XCTAssertEqual(artwork.records.count, 1)
         XCTAssertEqual(artwork.records.first?.expression.note, "clear air")
         XCTAssertEqual(artwork.presentation.marks.count, 1)
@@ -207,6 +207,43 @@ final class AppRootModelTests: XCTestCase {
 
         model.showUpdatedArtwork()
         XCTAssertEqual(model.state, .currentArtwork(artwork))
+    }
+
+    func testDeniedOutdoorLocationStillCompletesWithoutDistanceStep() async throws {
+        let container = try FurtherModelContainer.inMemory()
+        let source = ModelContainerSource { container }
+        let timeSource = ControlledTimeSource(
+            now: Date(timeIntervalSince1970: 1_810_600_000)
+        )
+        let model = AppRootModel(
+            bootstrap: AppBootstrap(containerSource: source, timeSource: timeSource),
+            timeSource: timeSource,
+            locationSource: UnavailableLocationSource(authorization: .denied),
+            activityOrigin: DomainTestSamples.origin
+        )
+        await model.start()
+        await model.createArtwork(cycle: .time(.oneMonth))
+        model.beginRunPreparation()
+        await model.chooseOutdoorRun()
+        XCTAssertEqual(
+            model.state,
+            .run(.readyOutdoor(authorization: .denied, isStarting: false))
+        )
+
+        await model.confirmOutdoorRunStart()
+        try await timeSource.advance(by: 3)
+        await model.refreshRunSnapshot()
+        model.requestRunEnd()
+        await model.confirmRunEnd()
+        await model.keepReflectionSilent()
+
+        guard case let .reflection(.enteringArtwork(record, artwork)) = model.state else {
+            return XCTFail("Expected outdoor run to skip manual distance and enter artwork")
+        }
+        XCTAssertEqual(record.environment, .outdoor)
+        XCTAssertNil(record.summary.distance)
+        XCTAssertTrue(record.routeSamples.isEmpty)
+        XCTAssertEqual(artwork.records, [record])
     }
 }
 

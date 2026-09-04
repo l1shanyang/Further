@@ -13,6 +13,7 @@ struct AppComposition {
     let dataSource: AppDataSource
     let containerSource: ModelContainerSource
     let timeSource: any TimeSource
+    let locationSource: any LocationSource
 
     static func current(arguments: [String] = ProcessInfo.processInfo.arguments) -> AppComposition {
         arguments.contains(uiTestingLaunchArgument) ? .testing() : .production()
@@ -22,7 +23,8 @@ struct AppComposition {
         AppComposition(
             dataSource: .production,
             containerSource: .production,
-            timeSource: SystemTimeSource()
+            timeSource: SystemTimeSource(),
+            locationSource: CoreLocationSource()
         )
     }
 
@@ -30,7 +32,8 @@ struct AppComposition {
         AppComposition(
             dataSource: .testing,
             containerSource: .testing,
-            timeSource: SystemTimeSource()
+            timeSource: SystemTimeSource(),
+            locationSource: UnavailableLocationSource()
         )
     }
 
@@ -42,6 +45,7 @@ struct AppComposition {
         AppRootView(model: AppRootModel(
             bootstrap: bootstrap,
             timeSource: timeSource,
+            locationSource: locationSource,
             activityOrigin: activityOrigin
         ))
     }

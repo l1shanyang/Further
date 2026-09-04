@@ -16,6 +16,7 @@ final class ReflectionFlowTests: XCTestCase {
         for (feeling, note, expectsSilence, expectedNote) in cases {
             let state = ReflectionExpressionState(
                 activityID: ActivityID(),
+                environment: .indoor,
                 silenceColor: silenceColor,
                 feelingColor: feeling,
                 note: note

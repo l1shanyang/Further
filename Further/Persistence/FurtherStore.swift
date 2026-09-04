@@ -136,7 +136,7 @@ actor FurtherStore {
             }
 
             activityModel.checkpointData = try PersistenceCodec.encode(StoredCheckpoint(checkpoint))
-            try replaceRouteSamples(
+            try appendRouteSamples(
                 checkpoint.routeSamples,
                 activityID: checkpoint.assignment.activityID
             )
@@ -172,7 +172,7 @@ actor FurtherStore {
             activityModel.phaseRawValue = StoredActivityPhase.reflectionDraft.rawValue
             activityModel.recordData = try PersistenceCodec.encode(StoredActivityRecord(record))
             activityModel.reflectionDraftData = try PersistenceCodec.encode(draft)
-            try replaceRouteSamples(record.routeSamples, activityID: record.id)
+            try appendRouteSamples(record.routeSamples, activityID: record.id)
         }
     }
 
@@ -218,7 +218,7 @@ actor FurtherStore {
             activityModel.checkpointData = try PersistenceCodec.encode(StoredCheckpoint(checkpoint))
             activityModel.recordData = try PersistenceCodec.encode(StoredActivityRecord(record))
             activityModel.reflectionDraftData = try PersistenceCodec.encode(draft)
-            try replaceRouteSamples(record.routeSamples, activityID: record.id)
+            try appendRouteSamples(record.routeSamples, activityID: record.id)
         }
     }
 
@@ -383,7 +383,7 @@ actor FurtherStore {
         activityModel.checkpointData = nil
         activityModel.recordData = try PersistenceCodec.encode(StoredActivityRecord(record))
         activityModel.reflectionDraftData = nil
-        try replaceRouteSamples(record.routeSamples, activityID: record.id)
+        try appendRouteSamples(record.routeSamples, activityID: record.id)
     }
 
     private func transaction<T>(_ operation: () throws -> T) throws -> T {
@@ -518,15 +518,22 @@ actor FurtherStore {
         }
     }
 
-    private func replaceRouteSamples(
+    private func appendRouteSamples(
         _ samples: [RouteSample],
         activityID: ActivityID
     ) throws {
         let existing = try modelContext.fetch(FetchDescriptor<FurtherSchemaV1.RouteSampleModel>())
             .filter { $0.activityID == activityID.rawValue }
-        existing.forEach(modelContext.delete)
+            .sorted { $0.sequence < $1.sequence }
+        guard existing.enumerated().allSatisfy({ $0.offset == $0.element.sequence }),
+              samples.count >= existing.count,
+              try zip(samples, existing).allSatisfy({ sample, model in
+                  try PersistenceCodec.encode(sample) == model.sampleData
+              }) else {
+            throw FurtherStoreError.storedIdentityMismatch
+        }
 
-        for (sequence, sample) in samples.enumerated() {
+        for (sequence, sample) in samples.enumerated().dropFirst(existing.count) {
             modelContext.insert(FurtherSchemaV1.RouteSampleModel(
                 activityID: activityID.rawValue,
                 sequence: sequence,

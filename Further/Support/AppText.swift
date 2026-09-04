@@ -148,6 +148,16 @@ enum AppText {
         defaultValue: "Indoor run",
         comment: "Indoor running environment option."
     )
+    static let outdoorRun = String(
+        localized: "run.environment.outdoor",
+        defaultValue: "Outdoor run",
+        comment: "Outdoor running environment option."
+    )
+    static let outdoorLocationUnavailable = String(
+        localized: "run.environment.outdoor.location-unavailable",
+        defaultValue: "Location is unavailable. You can still run; route and distance may be missing.",
+        comment: "Non-blocking explanation when outdoor location cannot be recorded."
+    )
     static let cancel = String(
         localized: "action.cancel",
         defaultValue: "Cancel",

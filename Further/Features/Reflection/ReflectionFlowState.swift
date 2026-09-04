@@ -2,6 +2,7 @@ import Foundation
 
 struct ReflectionExpressionState: Equatable, Sendable {
     let activityID: ActivityID
+    let environment: RunningEnvironment
     let silenceColor: SilenceColor
     var feelingColor: FeelingColor?
     var note: String
@@ -29,7 +30,7 @@ enum ReflectionFlowViewState: Equatable, Sendable {
     case expression(ReflectionExpressionState)
     case indoorDistance(IndoorDistanceState)
     case enteringArtwork(
-        recordColor: RecordColorValue,
+        record: SharedActivityRecordV1,
         artwork: CurrentArtworkViewState
     )
 }

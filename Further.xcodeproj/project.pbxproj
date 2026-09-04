@@ -47,6 +47,10 @@
 		H10000000000000000000001 /* ReflectionFlowState.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000000000000000000001 /* ReflectionFlowState.swift */; };
 		H10000000000000000000002 /* ReflectionFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000000000000000000002 /* ReflectionFlowView.swift */; };
 		H10000000000000000000003 /* ReflectionFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = H20000000000000000000003 /* ReflectionFlowTests.swift */; };
+		I10000000000000000000001 /* LocationSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = I20000000000000000000001 /* LocationSource.swift */; };
+		I10000000000000000000002 /* LocationRouteAccumulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = I20000000000000000000002 /* LocationRouteAccumulator.swift */; };
+		I10000000000000000000003 /* CoreLocationSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = I20000000000000000000003 /* CoreLocationSource.swift */; };
+		I10000000000000000000004 /* LocationRouteAccumulatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = I20000000000000000000004 /* LocationRouteAccumulatorTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -110,6 +114,11 @@
 		H20000000000000000000001 /* ReflectionFlowState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReflectionFlowState.swift; sourceTree = "<group>"; };
 		H20000000000000000000002 /* ReflectionFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReflectionFlowView.swift; sourceTree = "<group>"; };
 		H20000000000000000000003 /* ReflectionFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReflectionFlowTests.swift; sourceTree = "<group>"; };
+		I20000000000000000000001 /* LocationSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSource.swift; sourceTree = "<group>"; };
+		I20000000000000000000002 /* LocationRouteAccumulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationRouteAccumulator.swift; sourceTree = "<group>"; };
+		I20000000000000000000003 /* CoreLocationSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreLocationSource.swift; sourceTree = "<group>"; };
+		I20000000000000000000004 /* LocationRouteAccumulatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationRouteAccumulatorTests.swift; sourceTree = "<group>"; };
+		I20000000000000000000005 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -150,6 +159,7 @@
 		A70000000000000000000002 /* Further */ = {
 			isa = PBXGroup;
 			children = (
+				I20000000000000000000005 /* Info.plist */,
 				B70000000000000000000001 /* App */,
 				B70000000000000000000002 /* Domain */,
 				B70000000000000000000003 /* Persistence */,
@@ -249,6 +259,8 @@
 		B70000000000000000000006 /* Run */ = {
 			isa = PBXGroup;
 			children = (
+				I20000000000000000000001 /* LocationSource.swift */,
+				I20000000000000000000002 /* LocationRouteAccumulator.swift */,
 				G20000000000000000000001 /* RunRecorder.swift */,
 				G20000000000000000000002 /* RunFlowState.swift */,
 				G20000000000000000000003 /* RunFlowView.swift */,
@@ -298,6 +310,7 @@
 		B7000000000000000000000C /* Location */ = {
 			isa = PBXGroup;
 			children = (
+				I20000000000000000000003 /* CoreLocationSource.swift */,
 			);
 			path = Location;
 			sourceTree = "<group>";
@@ -374,6 +387,7 @@
 			isa = PBXGroup;
 			children = (
 				G20000000000000000000004 /* RunRecorderTests.swift */,
+				I20000000000000000000004 /* LocationRouteAccumulatorTests.swift */,
 			);
 			path = Run;
 			sourceTree = "<group>";
@@ -548,6 +562,9 @@
 				G10000000000000000000003 /* RunFlowView.swift in Sources */,
 				H10000000000000000000001 /* ReflectionFlowState.swift in Sources */,
 				H10000000000000000000002 /* ReflectionFlowView.swift in Sources */,
+				I10000000000000000000001 /* LocationSource.swift in Sources */,
+				I10000000000000000000002 /* LocationRouteAccumulator.swift in Sources */,
+				I10000000000000000000003 /* CoreLocationSource.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -567,6 +584,7 @@
 				F10000000000000000000005 /* BasicArtworkRendererTests.swift in Sources */,
 				G10000000000000000000004 /* RunRecorderTests.swift in Sources */,
 				H10000000000000000000003 /* ReflectionFlowTests.swift in Sources */,
+				I10000000000000000000004 /* LocationRouteAccumulatorTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -640,6 +658,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Further;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_FILE = Further/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -663,6 +682,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Further;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_FILE = Further/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

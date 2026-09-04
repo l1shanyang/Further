@@ -4,6 +4,7 @@ struct RunFlowView: View {
     let state: RunFlowViewState
     let isCommandInFlight: Bool
     let onChooseIndoor: () -> Void
+    let onChooseOutdoor: () -> Void
     let onCancelPreparation: () -> Void
     let onStart: () -> Void
     let onPause: () -> Void
@@ -24,7 +25,9 @@ struct RunFlowView: View {
         case .environmentSelection:
             environmentSelection
         case let .readyIndoor(isStarting):
-            readyIndoor(isStarting: isStarting)
+            ready(environment: .indoor, authorization: nil, isStarting: isStarting)
+        case let .readyOutdoor(authorization, isStarting):
+            ready(environment: .outdoor, authorization: authorization, isStarting: isStarting)
         case let .countdown(remainingSeconds):
             countdown(remainingSeconds: remainingSeconds)
         case let .tracking(activeState):
@@ -48,13 +51,21 @@ struct RunFlowView: View {
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .accessibilityIdentifier("run.choose-indoor")
+            Button(AppText.outdoorRun, action: onChooseOutdoor)
+                .buttonStyle(.bordered)
+                .controlSize(.large)
+                .accessibilityIdentifier("run.choose-outdoor")
             Button(AppText.cancel, action: onCancelPreparation)
                 .buttonStyle(.borderless)
             Spacer()
         }
     }
 
-    private func readyIndoor(isStarting: Bool) -> some View {
+    private func ready(
+        environment: RunningEnvironment,
+        authorization: LocationAuthorizationState?,
+        isStarting: Bool
+    ) -> some View {
         VStack(spacing: 24) {
             Spacer()
             Image(systemName: "figure.run")
@@ -64,6 +75,12 @@ struct RunFlowView: View {
             Text(AppText.startRunPromise)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
+            if environment == .outdoor, authorization?.canRecordLocation != true {
+                Text(AppText.outdoorLocationUnavailable)
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.secondary)
+                    .accessibilityIdentifier("run.location-unavailable")
+            }
 
             Button {
                 onStart()
@@ -113,8 +130,9 @@ struct RunFlowView: View {
                 Text(AppText.distance)
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                Text(AppText.notRecorded)
+                Text(formatDistance(activeState.distance))
                     .font(.title3)
+                    .accessibilityIdentifier("run.distance-value")
             }
 
             HStack(spacing: 16) {
@@ -177,6 +195,11 @@ struct RunFlowView: View {
         let minutes = (totalSeconds % 3_600) / 60
         let seconds = totalSeconds % 60
         return String(format: "%02d:%02d:%02d", hours, minutes, seconds)
+    }
+
+    private func formatDistance(_ distance: ActivityDistance?) -> String {
+        guard let distance else { return AppText.notRecorded }
+        return String(format: "%.2f %@", distance.meters / 1_000, AppText.kilometers)
     }
 }
 

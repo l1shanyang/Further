@@ -5,6 +5,7 @@ enum RunRecorderError: Error, Equatable {
     case notStarted
     case invalidTransition
     case timeMovedBackward
+    case locationPersistenceFailed
 }
 
 enum RunRecorderPhase: Equatable, Sendable {
@@ -38,23 +39,30 @@ actor RunRecorder {
     private let environment: RunningEnvironment
     private let timeZone: TimeZone
     private let origin: ActivityOrigin
+    private let locationSource: (any LocationSource)?
 
     private var state = State.ready
     private var assignment: ActivityAssignment?
     private var events: [ActivityEvent] = []
+    private var routeAccumulator = LocationRouteAccumulator()
+    private var locationTask: Task<Void, Never>?
+    private var samplesAtLastCheckpoint = 0
+    private var locationPersistenceFailed = false
 
     init(
         store: FurtherStore,
         timeSource: any TimeSource,
         environment: RunningEnvironment,
         timeZone: TimeZone,
-        origin: ActivityOrigin
+        origin: ActivityOrigin,
+        locationSource: (any LocationSource)? = nil
     ) {
         self.store = store
         self.timeSource = timeSource
         self.environment = environment
         self.timeZone = timeZone
         self.origin = origin
+        self.locationSource = locationSource
     }
 
     func start() async throws -> RunRecorderSnapshot {
@@ -74,6 +82,9 @@ actor RunRecorder {
         )
         self.assignment = assignment
         state = .countdown(until: now.addingTimeInterval(Self.countdownDuration))
+        if environment == .outdoor {
+            await startLocationUpdates()
+        }
         return try snapshot(at: now)
     }
 
@@ -90,8 +101,10 @@ actor RunRecorder {
 
         events.append(ActivityEvent(kind: .paused, occurredAt: now))
         state = .paused
+        routeAccumulator.breakSegment()
         let snapshot = try snapshot(at: now)
         try await store.saveCheckpoint(try checkpoint(from: snapshot, capturedAt: now))
+        samplesAtLastCheckpoint = routeAccumulator.samples.count
         return snapshot
     }
 
@@ -103,8 +116,10 @@ actor RunRecorder {
 
         events.append(ActivityEvent(kind: .resumed, occurredAt: now))
         state = .running
+        routeAccumulator.breakSegment()
         let snapshot = try snapshot(at: now)
         try await store.saveCheckpoint(try checkpoint(from: snapshot, capturedAt: now))
+        samplesAtLastCheckpoint = routeAccumulator.samples.count
         return snapshot
     }
 
@@ -113,18 +128,27 @@ actor RunRecorder {
         let snapshot = try snapshot(at: now)
         guard snapshot.phase != .finished else { return }
         try await store.saveCheckpoint(try checkpoint(from: snapshot, capturedAt: now))
+        samplesAtLastCheckpoint = routeAccumulator.samples.count
+    }
+
+    func waitForPendingLocationUpdates() async {
+        await locationTask?.value
     }
 
     func finish() async throws -> SharedActivityRecordV1 {
-        let now = await currentTime()
-        let snapshot = try snapshot(at: now)
-        guard snapshot.phase == .running || snapshot.phase == .paused,
+        let initialTime = await currentTime()
+        let currentSnapshot = try snapshot(at: initialTime)
+        guard currentSnapshot.phase == .running || currentSnapshot.phase == .paused,
               let assignment else {
             throw RunRecorderError.invalidTransition
         }
 
+        await stopLocationUpdates()
+        let endedAt = await currentTime()
+        let snapshot = try snapshot(at: endedAt)
+
         let expression = try Self.silenceExpression(for: assignment.activityID)
-        let checkpoint = try checkpoint(from: snapshot, capturedAt: now)
+        let checkpoint = try checkpoint(from: snapshot, capturedAt: endedAt)
         let record = try SharedActivityRecordV1(
             id: assignment.activityID,
             artworkID: assignment.artworkID,
@@ -133,14 +157,14 @@ actor RunRecorder {
             lifecycle: .endedNormally,
             summary: ActivitySummary(
                 startedAt: assignment.startedAt,
-                endedAt: now,
+                endedAt: endedAt,
                 startTimeZoneIdentifier: assignment.startTimeZoneIdentifier,
                 activeDuration: snapshot.activeDuration,
                 pausedDuration: snapshot.pausedDuration,
                 distance: snapshot.distance
             ),
             events: events,
-            routeSamples: [],
+            routeSamples: routeAccumulator.samples,
             expression: expression
         )
         try await store.endActivity(
@@ -153,6 +177,9 @@ actor RunRecorder {
     }
 
     private func snapshot(at now: Date) throws -> RunRecorderSnapshot {
+        guard !locationPersistenceFailed else {
+            throw RunRecorderError.locationPersistenceFailed
+        }
         guard let assignment else {
             throw RunRecorderError.notStarted
         }
@@ -185,7 +212,7 @@ actor RunRecorder {
             phase: phase,
             activeDuration: activeDuration,
             pausedDuration: pausedDuration,
-            distance: nil
+            distance: routeAccumulator.distance
         )
     }
 
@@ -229,7 +256,7 @@ actor RunRecorder {
             pausedDuration: snapshot.pausedDuration,
             events: events,
             distance: snapshot.distance,
-            routeSamples: [],
+            routeSamples: routeAccumulator.samples,
             origin: origin
         )
     }
@@ -243,5 +270,50 @@ actor RunRecorder {
             ),
             note: nil
         )
+    }
+
+    private func startLocationUpdates() async {
+        guard let locationSource, locationTask == nil else { return }
+        let stream = await locationSource.startUpdates()
+        locationTask = Task { [weak self] in
+            for await measurement in stream {
+                await self?.record(measurement)
+            }
+        }
+    }
+
+    private func stopLocationUpdates() async {
+        let task = locationTask
+        if let locationSource {
+            await locationSource.stopUpdates()
+        }
+        await task?.value
+        locationTask = nil
+    }
+
+    private func record(_ measurement: LocationMeasurement) async {
+        guard let assignment, !locationPersistenceFailed else { return }
+        let isActive: Bool = switch state {
+        case .countdown, .running:
+            true
+        case .ready, .paused, .finished:
+            false
+        }
+
+        do {
+            try routeAccumulator.record(
+                measurement,
+                sessionStartedAt: assignment.startedAt,
+                isActive: isActive
+            )
+            if routeAccumulator.samples.count - samplesAtLastCheckpoint >= 20 {
+                let capturedAt = await currentTime()
+                let snapshot = try snapshot(at: capturedAt)
+                try await store.saveCheckpoint(try checkpoint(from: snapshot, capturedAt: capturedAt))
+                samplesAtLastCheckpoint = routeAccumulator.samples.count
+            }
+        } catch {
+            locationPersistenceFailed = true
+        }
     }
 }

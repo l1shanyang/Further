@@ -32,6 +32,7 @@ final class AppRootModel {
 
     private let bootstrap: AppBootstrap
     private let timeSource: any TimeSource
+    private let locationSource: any LocationSource
     private let activityOrigin: ActivityOrigin
     private var store: FurtherStore?
     private var isStarting = false
@@ -43,6 +44,7 @@ final class AppRootModel {
     init(
         bootstrap: AppBootstrap,
         timeSource: any TimeSource,
+        locationSource: any LocationSource = UnavailableLocationSource(),
         activityOrigin: ActivityOrigin = ActivityOrigin(
             productIdentifier: "com.example.Further",
             productVersion: "testing",
@@ -52,6 +54,7 @@ final class AppRootModel {
     ) {
         self.bootstrap = bootstrap
         self.timeSource = timeSource
+        self.locationSource = locationSource
         self.activityOrigin = activityOrigin
     }
 
@@ -120,25 +123,58 @@ final class AppRootModel {
         state = .run(.readyIndoor(isStarting: false))
     }
 
+    func chooseOutdoorRun() async {
+        guard state == .run(.environmentSelection) else { return }
+        let authorization = await locationSource.requestAuthorization()
+        guard state == .run(.environmentSelection) else { return }
+        state = .run(.readyOutdoor(authorization: authorization, isStarting: false))
+    }
+
     func cancelRunPreparation() {
         guard case let .run(runState) = state,
-              runState == .environmentSelection || runState == .readyIndoor(isStarting: false),
+              runState.canCancelPreparation,
               let artworkBeforeRun else { return }
         state = .currentArtwork(artworkBeforeRun)
         self.artworkBeforeRun = nil
     }
 
     func confirmIndoorRunStart() async {
-        guard state == .run(.readyIndoor(isStarting: false)),
-              let store else { return }
-        state = .run(.readyIndoor(isStarting: true))
+        await confirmRunStart(environment: .indoor)
+    }
+
+    func confirmOutdoorRunStart() async {
+        await confirmRunStart(environment: .outdoor)
+    }
+
+    func confirmSelectedRunStart() async {
+        switch state {
+        case .run(.readyIndoor):
+            await confirmIndoorRunStart()
+        case .run(.readyOutdoor):
+            await confirmOutdoorRunStart()
+        default:
+            break
+        }
+    }
+
+    private func confirmRunStart(environment: RunningEnvironment) async {
+        guard let store else { return }
+        switch (environment, state) {
+        case (.indoor, .run(.readyIndoor(isStarting: false))):
+            state = .run(.readyIndoor(isStarting: true))
+        case let (.outdoor, .run(.readyOutdoor(authorization, isStarting: false))):
+            state = .run(.readyOutdoor(authorization: authorization, isStarting: true))
+        default:
+            return
+        }
 
         let recorder = RunRecorder(
             store: store,
             timeSource: timeSource,
-            environment: .indoor,
+            environment: environment,
             timeZone: .current,
-            origin: activityOrigin
+            origin: activityOrigin,
+            locationSource: environment == .outdoor ? locationSource : nil
         )
         self.recorder = recorder
 
@@ -219,6 +255,7 @@ final class AppRootModel {
             }
             state = .reflection(.expression(ReflectionExpressionState(
                 activityID: record.id,
+                environment: record.environment,
                 silenceColor: color,
                 feelingColor: nil,
                 note: note ?? ""
@@ -355,9 +392,15 @@ final class AppRootModel {
         case let .countdown(remainingSeconds):
             state = .run(.countdown(remainingSeconds: remainingSeconds))
         case .running:
-            state = .run(.tracking(.running(activeDuration: snapshot.activeDuration)))
+            state = .run(.tracking(.running(
+                activeDuration: snapshot.activeDuration,
+                distance: snapshot.distance
+            )))
         case .paused:
-            state = .run(.tracking(.paused(activeDuration: snapshot.activeDuration)))
+            state = .run(.tracking(.paused(
+                activeDuration: snapshot.activeDuration,
+                distance: snapshot.distance
+            )))
         case .finished:
             break
         }
@@ -431,11 +474,19 @@ final class AppRootModel {
               current.activityID == expression.activityID else { return }
         do {
             try await store.lockExpression(current.draft, activityID: current.activityID)
-            state = .reflection(.indoorDistance(IndoorDistanceState(
-                activityID: current.activityID,
-                kilometers: "",
-                showsValidationError: false
-            )))
+            if current.environment == .indoor {
+                state = .reflection(.indoorDistance(IndoorDistanceState(
+                    activityID: current.activityID,
+                    kilometers: "",
+                    showsValidationError: false
+                )))
+            } else {
+                await finalizeReflection(
+                    activityID: current.activityID,
+                    manualDistanceMeters: nil,
+                    commandAlreadyInFlight: true
+                )
+            }
         } catch {
             state = .blocked
         }
@@ -443,11 +494,18 @@ final class AppRootModel {
 
     private func finalizeReflection(
         activityID: ActivityID,
-        manualDistanceMeters: Double?
+        manualDistanceMeters: Double?,
+        commandAlreadyInFlight: Bool = false
     ) async {
-        guard !isReflectionCommandInFlight, let store else { return }
-        isReflectionCommandInFlight = true
-        defer { isReflectionCommandInFlight = false }
+        guard (commandAlreadyInFlight || !isReflectionCommandInFlight), let store else { return }
+        if !commandAlreadyInFlight {
+            isReflectionCommandInFlight = true
+        }
+        defer {
+            if !commandAlreadyInFlight {
+                isReflectionCommandInFlight = false
+            }
+        }
 
         do {
             let record = try await store.lockReflection(
@@ -462,7 +520,7 @@ final class AppRootModel {
             }
             let records = try await store.records(for: artwork.id)
             state = .reflection(.enteringArtwork(
-                recordColor: record.expression.recordColor,
+                record: record,
                 artwork: CurrentArtworkViewState(artwork: artwork, records: records)
             ))
         } catch {
@@ -491,7 +549,7 @@ private extension RunFlowViewState {
         switch self {
         case .endingConfirmation, .awaitingReflection:
             true
-        case .environmentSelection, .readyIndoor, .countdown, .tracking:
+        case .environmentSelection, .readyIndoor, .readyOutdoor, .countdown, .tracking:
             false
         }
     }
@@ -500,12 +558,25 @@ private extension RunFlowViewState {
         switch self {
         case .countdown, .tracking, .endingConfirmation:
             true
-        case .environmentSelection, .readyIndoor, .awaitingReflection:
+        case .environmentSelection, .readyIndoor, .readyOutdoor, .awaitingReflection:
             false
         }
     }
 
     var hasLiveSession: Bool {
         hasPersistedSession
+    }
+}
+
+private extension RunFlowViewState {
+    var canCancelPreparation: Bool {
+        switch self {
+        case .environmentSelection, .readyIndoor(isStarting: false),
+             .readyOutdoor(_, isStarting: false):
+            true
+        case .readyIndoor(isStarting: true), .readyOutdoor(_, isStarting: true),
+             .countdown, .tracking, .endingConfirmation, .awaitingReflection:
+            false
+        }
     }
 }
