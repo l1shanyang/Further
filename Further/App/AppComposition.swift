@@ -9,6 +9,8 @@ enum AppDataSource: Equatable {
 @MainActor
 struct AppComposition {
     static let uiTestingLaunchArgument = "-ui-testing"
+    static let uiTestingLargeTextLaunchArgument = "-ui-testing-large-text"
+    static let uiTestingDarkModeLaunchArgument = "-ui-testing-dark-mode"
 
     let dataSource: AppDataSource
     let containerSource: ModelContainerSource
@@ -16,9 +18,10 @@ struct AppComposition {
     let locationSource: any LocationSource
     let healthWriter: any HealthWriter
     let distanceUnitStore: any DistanceUnitStoring
+    let presentationOverrides: PresentationOverrides
 
     static func current(arguments: [String] = ProcessInfo.processInfo.arguments) -> AppComposition {
-        arguments.contains(uiTestingLaunchArgument) ? .testing() : .production()
+        arguments.contains(uiTestingLaunchArgument) ? .testing(arguments: arguments) : .production()
     }
 
     static func production() -> AppComposition {
@@ -28,18 +31,25 @@ struct AppComposition {
             timeSource: SystemTimeSource(),
             locationSource: CoreLocationSource(),
             healthWriter: HealthKitWriter(),
-            distanceUnitStore: UserDefaultsDistanceUnitStore()
+            distanceUnitStore: UserDefaultsDistanceUnitStore(),
+            presentationOverrides: PresentationOverrides()
         )
     }
 
-    static func testing() -> AppComposition {
+    static func testing(arguments: [String] = []) -> AppComposition {
         AppComposition(
             dataSource: .testing,
             containerSource: .testing,
             timeSource: SystemTimeSource(),
             locationSource: UnavailableLocationSource(),
             healthWriter: UnavailableHealthWriter(),
-            distanceUnitStore: InMemoryDistanceUnitStore()
+            distanceUnitStore: InMemoryDistanceUnitStore(),
+            presentationOverrides: PresentationOverrides(
+                dynamicTypeSize: arguments.contains(uiTestingLargeTextLaunchArgument)
+                    ? .accessibility5
+                    : nil,
+                colorScheme: arguments.contains(uiTestingDarkModeLaunchArgument) ? .dark : nil
+            )
         )
     }
 
@@ -56,6 +66,12 @@ struct AppComposition {
             distanceUnitStore: distanceUnitStore,
             activityOrigin: activityOrigin
         ))
+        .transformEnvironment(\.dynamicTypeSize) { value in
+            if let override = presentationOverrides.dynamicTypeSize {
+                value = override
+            }
+        }
+        .preferredColorScheme(presentationOverrides.colorScheme)
     }
 
     private var activityOrigin: ActivityOrigin {
@@ -68,4 +84,9 @@ struct AppComposition {
             operatingSystemVersion: ProcessInfo.processInfo.operatingSystemVersionString
         )
     }
+}
+
+struct PresentationOverrides {
+    var dynamicTypeSize: DynamicTypeSize?
+    var colorScheme: ColorScheme?
 }

@@ -80,4 +80,11 @@ struct FeelingColorOption: Identifiable, Equatable, Sendable {
         FeelingColorOption(id: "dusk", red: 106, green: 100, blue: 158),
         FeelingColorOption(id: "clay", red: 157, green: 112, blue: 105),
     ]
+
+    static func accessibilityNumber(for color: FeelingColor) -> Int? {
+        all.firstIndex(where: {
+            $0.color.identifier == color.identifier
+                && $0.color.paletteVersion == color.paletteVersion
+        }).map { $0 + 1 }
+    }
 }

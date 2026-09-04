@@ -220,6 +220,7 @@ private struct ArtworkCycleSelectionView: View {
                 }
                 .buttonStyle(.plain)
                 .padding(.vertical, 9)
+                .accessibilityAddTraits(selection == option ? .isSelected : [])
                 .accessibilityIdentifier("cycle.option.\(option.rawValue)")
             }
         }
@@ -341,7 +342,8 @@ struct BasicArtworkView: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(AppText.artworkCanvas)
-        .accessibilityValue(String(description.marks.count))
+        .accessibilityValue(AppText.artworkMarkCount(description.marks.count))
+        .accessibilityIdentifier("artwork.canvas")
     }
 }
 

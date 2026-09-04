@@ -97,6 +97,28 @@
         }
       }
     },
+    "artwork.canvas.mark-count" : {
+      "comment" : "VoiceOver value describing how many real run marks the artwork contains.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld marks"
+          }
+        }
+      }
+    },
+    "artwork.canvas.no-marks" : {
+      "comment" : "VoiceOver value for a blank artwork.",
+      "extractionState" : "manual",
+      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "No marks yet" } } }
+    },
+    "artwork.canvas.one-mark" : {
+      "comment" : "VoiceOver value for an artwork with one run mark.",
+      "extractionState" : "manual",
+      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "1 mark" } } }
+    },
     "artwork.completed.title" : {
       "comment" : "Title for a completed current artwork.",
       "extractionState" : "manual",
@@ -261,18 +283,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Your data couldn’t be opened."
-          }
-        }
-      }
-    },
-    "launch.tagline" : {
-      "comment" : "The quiet tagline shown below the product name.",
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "still going."
           }
         }
       }
@@ -675,6 +685,11 @@
     "lookback.title" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Look back" } } } },
     "record.active-time" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Active time" } } } },
     "record.color" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Record color" } } } },
+    "record.color.silence" : {
+      "comment" : "Neutral VoiceOver label for a record that kept a silence expression.",
+      "extractionState" : "manual",
+      "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Silent record color" } } }
+    },
     "record.date" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Date" } } } },
     "record.interruption" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Technical interruption" } } } },
     "record.note.missing" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "No note" } } } },
@@ -696,6 +711,18 @@
     "settings.permission.not-requested" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Not requested" } } } },
     "settings.permission.unavailable" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Unavailable" } } } },
     "settings.permissions" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Permissions" } } } },
+    "settings.permissions.degradation" : {
+      "comment" : "Explains that denied system permissions do not endanger local run data.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Further always saves runs locally. Location only adds outdoor distance and route; Health only receives a copy after a run is saved."
+          }
+        }
+      }
+    },
     "settings.title" : { "localizations" : { "en" : { "stringUnit" : { "state" : "new", "value" : "Settings" } } } },
     "unit.kilometers" : {
       "comment" : "Abbreviated kilometer unit.",

@@ -57,6 +57,11 @@ struct ReflectionFlowView: View {
                                         Circle()
                                             .strokeBorder(.primary, lineWidth: 3)
                                             .padding(3)
+                                        Image(systemName: "checkmark")
+                                            .font(.headline.bold())
+                                            .foregroundStyle(.primary)
+                                            .padding(8)
+                                            .background(.regularMaterial, in: Circle())
                                     }
                                 }
                                 .frame(width: 68, height: 68)
@@ -64,6 +69,9 @@ struct ReflectionFlowView: View {
                         .buttonStyle(.plain)
                         .disabled(isCommandInFlight)
                         .accessibilityLabel(AppText.feelingColor(index + 1))
+                        .accessibilityAddTraits(
+                            expression.feelingColor == option.color ? .isSelected : []
+                        )
                         .accessibilityIdentifier("reflection.color.\(index + 1)")
                     }
                 }
@@ -101,80 +109,86 @@ struct ReflectionFlowView: View {
     }
 
     private func distanceView(_ distance: IndoorDistanceState) -> some View {
-        VStack(alignment: .leading, spacing: 22) {
-            Spacer()
-            Text(AppText.addIndoorDistance)
-                .font(.largeTitle.bold())
-            Text(AppText.indoorDistanceMessage)
-                .foregroundStyle(.secondary)
-
-            HStack(alignment: .firstTextBaseline) {
-                TextField(
-                    AppText.distancePlaceholder,
-                    text: Binding(
-                        get: { distance.distanceInput },
-                        set: { value in onChangeDistance(value) }
-                    )
-                )
-                .keyboardType(.decimalPad)
-                .textFieldStyle(.roundedBorder)
-                .accessibilityIdentifier("reflection.distance")
-                Text(distanceUnit.symbol)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 22) {
+                Text(AppText.addIndoorDistance)
+                    .font(.largeTitle.bold())
+                Text(AppText.indoorDistanceMessage)
                     .foregroundStyle(.secondary)
-            }
 
-            if distance.showsValidationError {
-                Text(AppText.validDistanceRequired)
-                    .font(.footnote)
-                    .foregroundStyle(.red)
-            }
+                HStack(alignment: .firstTextBaseline) {
+                    TextField(
+                        AppText.distancePlaceholder,
+                        text: Binding(
+                            get: { distance.distanceInput },
+                            set: { value in onChangeDistance(value) }
+                        )
+                    )
+                    .keyboardType(.decimalPad)
+                    .textFieldStyle(.roundedBorder)
+                    .accessibilityIdentifier("reflection.distance")
+                    Text(distanceUnit.symbol)
+                        .foregroundStyle(.secondary)
+                }
 
-            Button(AppText.saveDistance, action: onSaveDistance)
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .disabled(isCommandInFlight)
-                .accessibilityIdentifier("reflection.save-distance")
-            Button(AppText.skipDistance, action: onSkipDistance)
-                .buttonStyle(.borderless)
-                .disabled(isCommandInFlight)
-                .accessibilityIdentifier("reflection.skip-distance")
-            Spacer()
+                if distance.showsValidationError {
+                    Label(AppText.validDistanceRequired, systemImage: "exclamationmark.circle")
+                        .font(.footnote)
+                        .foregroundStyle(.red)
+                }
+
+                Button(AppText.saveDistance, action: onSaveDistance)
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
+                    .disabled(isCommandInFlight)
+                    .accessibilityIdentifier("reflection.save-distance")
+                Button(AppText.skipDistance, action: onSkipDistance)
+                    .buttonStyle(.borderless)
+                    .disabled(isCommandInFlight)
+                    .accessibilityIdentifier("reflection.skip-distance")
+            }
+            .frame(maxWidth: .infinity, minHeight: 520, alignment: .center)
         }
+        .accessibilityIdentifier("reflection.distance-entry")
     }
 
     private func enteringArtworkView(
         record: SharedActivityRecordV1,
         artwork: CurrentArtworkViewState
     ) -> some View {
-        VStack(spacing: 26) {
-            Spacer()
-            ZStack {
-                Circle()
-                    .fill(Color(record.expression.recordColor))
-                    .frame(width: 96, height: 96)
-                Image(systemName: "arrow.down")
-                    .font(.title.bold())
-                    .foregroundStyle(.white)
-            }
-            Text(AppText.recordJoinedArtwork)
-                .font(.largeTitle.bold())
+        ScrollView {
+            VStack(spacing: 26) {
+                ZStack {
+                    Circle()
+                        .fill(Color(record.expression.recordColor))
+                        .frame(width: 96, height: 96)
+                    Image(systemName: "arrow.down")
+                        .font(.title.bold())
+                        .foregroundStyle(.primary)
+                        .padding(10)
+                        .background(.regularMaterial, in: Circle())
+                }
+                Text(AppText.recordJoinedArtwork)
+                    .font(.largeTitle.bold())
+                    .multilineTextAlignment(.center)
+                Text(
+                    artwork.presentation.phase == .completed
+                        ? AppText.artworkCompletedByRun
+                        : AppText.artworkNowHasMarks(artwork.presentation.marks.count)
+                )
+                .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
-            Text(
-                artwork.presentation.phase == .completed
-                    ? AppText.artworkCompletedByRun
-                    : AppText.artworkNowHasMarks(artwork.presentation.marks.count)
-            )
-            .foregroundStyle(.secondary)
-            .multilineTextAlignment(.center)
-            if record.environment == .outdoor {
-                ActivityRouteView(record: record)
+                if record.environment == .outdoor {
+                    ActivityRouteView(record: record)
+                }
+                Button(AppText.viewArtwork, action: onShowArtwork)
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
+                    .accessibilityIdentifier("reflection.view-artwork")
             }
-            Button(AppText.viewArtwork, action: onShowArtwork)
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .accessibilityIdentifier("reflection.view-artwork")
-            Spacer()
+            .frame(maxWidth: .infinity, minHeight: 520, alignment: .center)
         }
+        .accessibilityIdentifier("reflection.artwork-entry")
     }
 }
 

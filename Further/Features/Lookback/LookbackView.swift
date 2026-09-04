@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct LookbackView: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     let state: LookbackFlowState
     let distanceUnit: DistanceUnit
     let onSelectRecord: (ActivityID) -> Void
@@ -56,7 +58,7 @@ struct LookbackView: View {
                 Circle()
                     .fill(Color(record.expression.recordColor))
                     .frame(width: 76, height: 76)
-                    .accessibilityLabel(AppText.recordColor)
+                    .accessibilityLabel(recordColorAccessibilityLabel(record.expression))
 
                 if let note = record.expression.note {
                     Text(note)
@@ -128,11 +130,21 @@ struct LookbackView: View {
     }
 
     private func fact(_ title: String, _ value: String) -> some View {
-        HStack(alignment: .firstTextBaseline) {
-            Text(title).foregroundStyle(.secondary)
-            Spacer()
-            Text(value).multilineTextAlignment(.trailing)
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title).foregroundStyle(.secondary)
+                    Text(value)
+                }
+            } else {
+                HStack(alignment: .firstTextBaseline) {
+                    Text(title).foregroundStyle(.secondary)
+                    Spacer()
+                    Text(value).multilineTextAlignment(.trailing)
+                }
+            }
         }
+        .accessibilityElement(children: .combine)
     }
 
     private func sectionTitle(_ key: LookbackMonthKey) -> String {
@@ -163,6 +175,18 @@ struct LookbackView: View {
 
     private func formatDistance(_ distance: ActivityDistance?) -> String {
         distanceUnit.format(meters: distance?.meters)
+    }
+
+    private func recordColorAccessibilityLabel(_ expression: RecordExpression) -> String {
+        switch expression {
+        case let .feeling(color, _):
+            guard let number = FeelingColorOption.accessibilityNumber(for: color) else {
+                return AppText.recordColor
+            }
+            return AppText.feelingColor(number)
+        case .silence:
+            return AppText.silenceRecordColor
+        }
     }
 }
 

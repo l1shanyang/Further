@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct CollectionView: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     let state: CollectionFlowState
     let distanceUnit: DistanceUnit
     let onSelectArtwork: (ArtworkID) -> Void
@@ -80,11 +82,21 @@ struct CollectionView: View {
     }
 
     private func fact(_ title: String, _ value: String) -> some View {
-        HStack(alignment: .firstTextBaseline) {
-            Text(title)
-            Spacer()
-            Text(value).multilineTextAlignment(.trailing)
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                    Text(value)
+                }
+            } else {
+                HStack(alignment: .firstTextBaseline) {
+                    Text(title)
+                    Spacer()
+                    Text(value).multilineTextAlignment(.trailing)
+                }
+            }
         }
+        .accessibilityElement(children: .combine)
     }
 
     private func cycleDescription(_ cycle: ArtworkCycle) -> String {

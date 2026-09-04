@@ -43,6 +43,18 @@ final class ReflectionFlowTests: XCTestCase {
         )
     }
 
+    func testFeelingPaletteKeepsStableAccessibilityNumbers() {
+        XCTAssertEqual(
+            FeelingColorOption.accessibilityNumber(for: FeelingColorOption.all[2].color),
+            3
+        )
+        XCTAssertNil(FeelingColorOption.accessibilityNumber(for: FeelingColor(
+            identifier: "future-color",
+            paletteVersion: "feeling-v2",
+            value: FeelingColorOption.all[0].color.value
+        )))
+    }
+
     private func silenceColor() throws -> SilenceColor {
         SilenceColor(
             identifier: "silence-test",

@@ -7,12 +7,6 @@ enum AppText {
         comment: "The product name shown on the launch page."
     )
 
-    static let launchTagline = String(
-        localized: "launch.tagline",
-        defaultValue: "still going.",
-        comment: "The quiet tagline shown below the product name."
-    )
-
     static let chooseCycleTitle = String(
         localized: "cycle.choose.title",
         defaultValue: "Choose an artwork cycle.",
@@ -335,6 +329,11 @@ enum AppText {
     static let back = String(localized: "action.back", defaultValue: "Back")
     static let singleRecord = String(localized: "record.title", defaultValue: "Run")
     static let recordColor = String(localized: "record.color", defaultValue: "Record color")
+    static let silenceRecordColor = String(
+        localized: "record.color.silence",
+        defaultValue: "Silent record color",
+        comment: "Neutral VoiceOver label for a record that kept a silence expression."
+    )
     static let date = String(localized: "record.date", defaultValue: "Date")
     static let activeTime = String(localized: "record.active-time", defaultValue: "Active time")
     static let runResult = String(localized: "record.result", defaultValue: "Result")
@@ -422,9 +421,14 @@ enum AppText {
         localized: "settings.open-system",
         defaultValue: "Open System Settings"
     )
+    static let permissionsDegradationMessage = String(
+        localized: "settings.permissions.degradation",
+        defaultValue: "Further always saves runs locally. Location only adds outdoor distance and route; Health only receives a copy after a run is saved.",
+        comment: "Explains that denied system permissions do not endanger local run data."
+    )
 
     static func feelingColor(_ number: Int) -> String {
-        String.localizedStringWithFormat(
+        return String.localizedStringWithFormat(
             String(
                 localized: "reflection.color.accessibility",
                 defaultValue: "Feeling color %lld",
@@ -435,11 +439,36 @@ enum AppText {
     }
 
     static func artworkNowHasMarks(_ count: Int) -> String {
-        String.localizedStringWithFormat(
+        return String.localizedStringWithFormat(
             String(
                 localized: "reflection.artwork.mark-count",
                 defaultValue: "Your artwork now holds %lld marks.",
                 comment: "Record-entry feedback with the current number of artwork marks."
+            ),
+            count
+        )
+    }
+
+    static func artworkMarkCount(_ count: Int) -> String {
+        if count == 0 {
+            return String(
+                localized: "artwork.canvas.no-marks",
+                defaultValue: "No marks yet",
+                comment: "VoiceOver value for a blank artwork."
+            )
+        }
+        if count == 1 {
+            return String(
+                localized: "artwork.canvas.one-mark",
+                defaultValue: "1 mark",
+                comment: "VoiceOver value for an artwork with one run mark."
+            )
+        }
+        return String.localizedStringWithFormat(
+            String(
+                localized: "artwork.canvas.mark-count",
+                defaultValue: "%lld marks",
+                comment: "VoiceOver value describing how many real run marks the artwork contains."
             ),
             count
         )

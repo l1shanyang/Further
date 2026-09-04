@@ -2,6 +2,8 @@ import SwiftUI
 import UIKit
 
 struct SettingsView: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     let state: SettingsViewState
     let onSelectDistanceUnit: (DistanceUnit) -> Void
     let onRequestHealthAuthorization: () -> Void
@@ -19,7 +21,7 @@ struct SettingsView: View {
                 .accessibilityIdentifier("settings.distance-unit")
             }
 
-            Section(AppText.permissions) {
+            Section {
                 permissionRow(
                     title: AppText.location,
                     state: locationDescription,
@@ -42,6 +44,10 @@ struct SettingsView: View {
                     Label(AppText.openSystemSettings, systemImage: "gear")
                 }
                 .accessibilityIdentifier("settings.system-settings")
+            } header: {
+                Text(AppText.permissions)
+            } footer: {
+                Text(AppText.permissionsDegradationMessage)
             }
         }
         .navigationTitle(AppText.settings)
@@ -66,10 +72,19 @@ struct SettingsView: View {
         state: String,
         accessibilityIdentifier: String
     ) -> some View {
-        HStack {
-            Text(title)
-            Spacer()
-            Text(state).foregroundStyle(.secondary)
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                    Text(state).foregroundStyle(.secondary)
+                }
+            } else {
+                HStack {
+                    Text(title)
+                    Spacer()
+                    Text(state).foregroundStyle(.secondary)
+                }
+            }
         }
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier(accessibilityIdentifier)

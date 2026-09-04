@@ -1,6 +1,11 @@
 import SwiftUI
 
 struct RunFlowView: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @ScaledMetric(relativeTo: .largeTitle) private var countdownFontSize = 112
+    @ScaledMetric(relativeTo: .largeTitle) private var trackingFontSize = 58
+    @ScaledMetric(relativeTo: .title) private var confirmationFontSize = 44
+
     let state: RunFlowViewState
     let distanceUnit: DistanceUnit
     let isCommandInFlight: Bool
@@ -41,25 +46,27 @@ struct RunFlowView: View {
     }
 
     private var environmentSelection: some View {
-        VStack(alignment: .leading, spacing: 24) {
-            Spacer()
-            Text(AppText.chooseRunEnvironment)
-                .font(.largeTitle.bold())
-            Text(AppText.indoorRunMessage)
-                .foregroundStyle(.secondary)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                Text(AppText.chooseRunEnvironment)
+                    .font(.largeTitle.bold())
+                Text(AppText.indoorRunMessage)
+                    .foregroundStyle(.secondary)
 
-            Button(AppText.indoorRun, action: onChooseIndoor)
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .accessibilityIdentifier("run.choose-indoor")
-            Button(AppText.outdoorRun, action: onChooseOutdoor)
-                .buttonStyle(.bordered)
-                .controlSize(.large)
-                .accessibilityIdentifier("run.choose-outdoor")
-            Button(AppText.cancel, action: onCancelPreparation)
-                .buttonStyle(.borderless)
-            Spacer()
+                Button(AppText.indoorRun, action: onChooseIndoor)
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
+                    .accessibilityIdentifier("run.choose-indoor")
+                Button(AppText.outdoorRun, action: onChooseOutdoor)
+                    .buttonStyle(.bordered)
+                    .controlSize(.large)
+                    .accessibilityIdentifier("run.choose-outdoor")
+                Button(AppText.cancel, action: onCancelPreparation)
+                    .buttonStyle(.borderless)
+            }
+            .frame(maxWidth: .infinity, minHeight: 520, alignment: .center)
         }
+        .accessibilityIdentifier("run.environment-selection")
     }
 
     private func ready(
@@ -67,49 +74,52 @@ struct RunFlowView: View {
         authorization: LocationAuthorizationState?,
         isStarting: Bool
     ) -> some View {
-        VStack(spacing: 24) {
-            Spacer()
-            Image(systemName: "figure.run")
-                .font(.system(size: 52))
-            Text(AppText.readyToRun)
-                .font(.largeTitle.bold())
-            Text(AppText.startRunPromise)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
-            if environment == .outdoor, authorization?.canRecordLocation != true {
-                Text(AppText.outdoorLocationUnavailable)
+        ScrollView {
+            VStack(spacing: 24) {
+                Image(systemName: "figure.run")
+                    .font(.system(size: 52))
+                Text(AppText.readyToRun)
+                    .font(.largeTitle.bold())
+                Text(AppText.startRunPromise)
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.secondary)
-                    .accessibilityIdentifier("run.location-unavailable")
-            }
-
-            Button {
-                onStart()
-            } label: {
-                if isStarting {
-                    ProgressView()
-                } else {
-                    Text(AppText.startRun)
+                if environment == .outdoor, authorization?.canRecordLocation != true {
+                    Text(AppText.outdoorLocationUnavailable)
+                        .multilineTextAlignment(.center)
+                        .foregroundStyle(.secondary)
+                        .accessibilityIdentifier("run.location-unavailable")
                 }
-            }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
-            .disabled(isStarting)
-            .accessibilityIdentifier("run.start")
 
-            Button(AppText.cancel, action: onCancelPreparation)
-                .buttonStyle(.borderless)
+                Button {
+                    onStart()
+                } label: {
+                    if isStarting {
+                        ProgressView()
+                    } else {
+                        Text(AppText.startRun)
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
                 .disabled(isStarting)
-            Spacer()
+                .accessibilityIdentifier("run.start")
+
+                Button(AppText.cancel, action: onCancelPreparation)
+                    .buttonStyle(.borderless)
+                    .disabled(isStarting)
+            }
+            .frame(maxWidth: .infinity, minHeight: 520, alignment: .center)
         }
+        .accessibilityIdentifier("run.ready")
     }
 
     private func countdown(remainingSeconds: Int) -> some View {
         VStack(spacing: 16) {
             Spacer()
             Text(String(remainingSeconds))
-                .font(.system(size: 112, weight: .bold, design: .rounded))
-                .contentTransition(.numericText())
+                .font(.system(size: countdownFontSize, weight: .bold, design: .rounded))
+                .contentTransition(reduceMotion ? .identity : .numericText())
+                .minimumScaleFactor(0.5)
                 .accessibilityIdentifier("run.countdown")
             Text(AppText.runHasStarted)
                 .foregroundStyle(.secondary)
@@ -118,41 +128,57 @@ struct RunFlowView: View {
     }
 
     private func tracking(_ activeState: ActiveRunViewState) -> some View {
-        VStack(spacing: 28) {
-            Spacer()
-            Text(activeState.isPaused ? AppText.runPaused : AppText.runInProgress)
+        ScrollView {
+            VStack(spacing: 28) {
+                Label(
+                    activeState.isPaused ? AppText.runPaused : AppText.runInProgress,
+                    systemImage: activeState.isPaused ? "pause.fill" : "figure.run"
+                )
                 .font(.headline)
                 .foregroundStyle(activeState.isPaused ? Color.orange : Color.secondary)
-            Text(formatDuration(activeState.activeDuration))
-                .font(.system(size: 58, weight: .semibold, design: .rounded))
-                .monospacedDigit()
-                .accessibilityIdentifier("run.active-time")
-            VStack(spacing: 4) {
-                Text(AppText.distance)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Text(formatDistance(activeState.distance))
-                    .font(.title3)
-                    .accessibilityIdentifier("run.distance-value")
-            }
+                Text(formatDuration(activeState.activeDuration))
+                    .font(.system(size: trackingFontSize, weight: .semibold, design: .rounded))
+                    .monospacedDigit()
+                    .minimumScaleFactor(0.45)
+                    .accessibilityIdentifier("run.active-time")
+                VStack(spacing: 4) {
+                    Text(AppText.distance)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(formatDistance(activeState.distance))
+                        .font(.title3)
+                        .accessibilityIdentifier("run.distance-value")
+                }
 
-            HStack(spacing: 16) {
-                Button(
-                    activeState.isPaused ? AppText.resumeRun : AppText.pauseRun,
-                    action: activeState.isPaused ? onResume : onPause
-                )
-                .buttonStyle(.borderedProminent)
+                ViewThatFits(in: .horizontal) {
+                    runActions(activeState, axis: .horizontal)
+                    runActions(activeState, axis: .vertical)
+                }
+            }
+            .frame(maxWidth: .infinity, minHeight: 520, alignment: .center)
+        }
+        .accessibilityIdentifier("run.tracking")
+    }
+
+    private func runActions(_ activeState: ActiveRunViewState, axis: Axis) -> some View {
+        let layout = axis == .horizontal
+            ? AnyLayout(HStackLayout(spacing: 16))
+            : AnyLayout(VStackLayout(spacing: 12))
+        return layout {
+            Button(
+                activeState.isPaused ? AppText.resumeRun : AppText.pauseRun,
+                action: activeState.isPaused ? onResume : onPause
+            )
+            .buttonStyle(.borderedProminent)
+            .controlSize(.large)
+            .disabled(isCommandInFlight)
+            .accessibilityIdentifier(activeState.isPaused ? "run.resume" : "run.pause")
+
+            Button(AppText.endRun, role: .destructive, action: onRequestEnd)
+                .buttonStyle(.bordered)
                 .controlSize(.large)
                 .disabled(isCommandInFlight)
-                .accessibilityIdentifier(activeState.isPaused ? "run.resume" : "run.pause")
-
-                Button(AppText.endRun, role: .destructive, action: onRequestEnd)
-                    .buttonStyle(.bordered)
-                    .controlSize(.large)
-                    .disabled(isCommandInFlight)
-                    .accessibilityIdentifier("run.end")
-            }
-            Spacer()
+                .accessibilityIdentifier("run.end")
         }
     }
 
@@ -166,28 +192,35 @@ struct RunFlowView: View {
     }
 
     private func endingConfirmation(_ previous: ActiveRunViewState) -> some View {
-        VStack(spacing: 22) {
-            Spacer()
-            Text(AppText.endRunTitle)
-                .font(.largeTitle.bold())
-            Text(formatDuration(previous.activeDuration))
-                .font(.system(size: 44, weight: .semibold, design: .rounded))
-                .monospacedDigit()
-            Text(AppText.endRunMessage)
-                .multilineTextAlignment(.center)
-                .foregroundStyle(.secondary)
-            Button(AppText.endRun, role: .destructive, action: onConfirmEnd)
-                .buttonStyle(.borderedProminent)
-                .controlSize(.large)
-                .disabled(isCommandInFlight)
-                .accessibilityIdentifier("run.confirm-end")
-            Button(AppText.keepRunning, action: onCancelEnd)
-                .buttonStyle(.bordered)
-                .controlSize(.large)
-                .disabled(isCommandInFlight)
-                .accessibilityIdentifier("run.keep-running")
-            Spacer()
+        ScrollView {
+            VStack(spacing: 22) {
+                Text(AppText.endRunTitle)
+                    .font(.largeTitle.bold())
+                Text(formatDuration(previous.activeDuration))
+                    .font(.system(
+                        size: confirmationFontSize,
+                        weight: .semibold,
+                        design: .rounded
+                    ))
+                    .monospacedDigit()
+                    .minimumScaleFactor(0.5)
+                Text(AppText.endRunMessage)
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.secondary)
+                Button(AppText.endRun, role: .destructive, action: onConfirmEnd)
+                    .buttonStyle(.borderedProminent)
+                    .controlSize(.large)
+                    .disabled(isCommandInFlight)
+                    .accessibilityIdentifier("run.confirm-end")
+                Button(AppText.keepRunning, action: onCancelEnd)
+                    .buttonStyle(.bordered)
+                    .controlSize(.large)
+                    .disabled(isCommandInFlight)
+                    .accessibilityIdentifier("run.keep-running")
+            }
+            .frame(maxWidth: .infinity, minHeight: 520, alignment: .center)
         }
+        .accessibilityIdentifier("run.ending-confirmation")
     }
 
     private func formatDuration(_ duration: TimeInterval) -> String {

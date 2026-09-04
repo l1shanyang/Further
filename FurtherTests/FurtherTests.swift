@@ -3,9 +3,8 @@ import XCTest
 
 @MainActor
 final class FurtherTests: XCTestCase {
-    func testLaunchCopyComesFromStringCatalog() {
+    func testProductNameComesFromStringCatalog() {
         XCTAssertEqual(AppText.productName, "Further")
-        XCTAssertEqual(AppText.launchTagline, "still going.")
     }
 
     func testProductionCompositionUsesProductionData() {
@@ -19,5 +18,18 @@ final class FurtherTests: XCTestCase {
         ])
 
         XCTAssertEqual(composition.dataSource, .testing)
+    }
+
+    func testQualityLaunchArgumentsOverridePresentationOnlyForUITests() {
+        let composition = AppComposition.current(arguments: [
+            "Further",
+            AppComposition.uiTestingLaunchArgument,
+            AppComposition.uiTestingLargeTextLaunchArgument,
+            AppComposition.uiTestingDarkModeLaunchArgument,
+        ])
+
+        XCTAssertEqual(composition.dataSource, .testing)
+        XCTAssertEqual(composition.presentationOverrides.dynamicTypeSize, .accessibility5)
+        XCTAssertEqual(composition.presentationOverrides.colorScheme, .dark)
     }
 }

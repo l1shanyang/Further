@@ -2,6 +2,87 @@ import XCTest
 
 @MainActor
 final class FurtherUITests: XCTestCase {
+    func testLargestTextKeepsPrimaryRunPathReachable() {
+        let app = XCUIApplication()
+        app.launchArguments += ["-ui-testing", "-ui-testing-large-text"]
+        app.launch()
+
+        let selection = app.scrollViews["cycle.selection"]
+        XCTAssertTrue(selection.waitForExistence(timeout: 5))
+        tapWhenReachable(app.buttons["cycle.confirm"], in: selection)
+
+        let artwork = app.scrollViews["artwork.current"]
+        XCTAssertTrue(artwork.waitForExistence(timeout: 5))
+        tapWhenReachable(app.buttons["artwork.prepare-run"], in: artwork)
+
+        let environment = app.scrollViews["run.environment-selection"]
+        XCTAssertTrue(environment.waitForExistence(timeout: 3))
+        tapWhenReachable(app.buttons["run.choose-indoor"], in: environment)
+
+        let ready = app.scrollViews["run.ready"]
+        XCTAssertTrue(ready.waitForExistence(timeout: 3))
+        tapWhenReachable(app.buttons["run.start"], in: ready)
+
+        let tracking = app.scrollViews["run.tracking"]
+        XCTAssertTrue(tracking.waitForExistence(timeout: 6))
+        tapWhenReachable(app.buttons["run.pause"], in: tracking)
+        XCTAssertTrue(app.buttons["run.resume"].waitForExistence(timeout: 2))
+    }
+
+    func testAccessibilitySemanticsExposeSelectionAndArtworkMeaning() {
+        let app = XCUIApplication()
+        app.launchArguments.append("-ui-testing")
+        app.launch()
+
+        XCTAssertTrue(app.scrollViews["cycle.selection"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["cycle.option.oneMonth"].isSelected)
+        app.buttons["cycle.confirm"].tap()
+        let blankCanvas = app.descendants(matching: .any)["artwork.canvas"]
+        XCTAssertTrue(blankCanvas.waitForExistence(timeout: 3))
+        XCTAssertEqual(blankCanvas.value as? String, "No marks yet")
+
+        app.buttons["artwork.prepare-run"].tap()
+        app.buttons["run.choose-indoor"].tap()
+        app.buttons["run.start"].tap()
+        XCTAssertTrue(app.buttons["run.end"].waitForExistence(timeout: 6))
+        app.buttons["run.end"].tap()
+        app.buttons["run.confirm-end"].tap()
+
+        let color = app.buttons["reflection.color.2"]
+        XCTAssertTrue(color.waitForExistence(timeout: 3))
+        XCTAssertEqual(color.label, "Feeling color 2")
+        color.tap()
+        XCTAssertTrue(color.isSelected)
+    }
+
+    func testDarkModeAndReduceMotionKeepArtworkEntryExplicit() {
+        let app = XCUIApplication()
+        app.launchArguments += [
+            "-ui-testing",
+            "-ui-testing-dark-mode",
+            "-UIAccessibilityReduceMotionEnabled",
+            "YES"
+        ]
+        app.launch()
+
+        XCTAssertTrue(app.scrollViews["cycle.selection"].waitForExistence(timeout: 5))
+        app.buttons["cycle.confirm"].tap()
+        app.buttons["artwork.prepare-run"].tap()
+        app.buttons["run.choose-indoor"].tap()
+        app.buttons["run.start"].tap()
+        XCTAssertTrue(app.buttons["run.end"].waitForExistence(timeout: 6))
+        app.buttons["run.end"].tap()
+        app.buttons["run.confirm-end"].tap()
+        XCTAssertTrue(app.scrollViews["reflection.expression"].waitForExistence(timeout: 3))
+        app.buttons["reflection.keep-silence"].tap()
+        app.buttons["reflection.skip-distance"].tap()
+
+        XCTAssertTrue(
+            app.staticTexts["This run is now part of your artwork."].waitForExistence(timeout: 3)
+        )
+        XCTAssertTrue(app.buttons["reflection.view-artwork"].isHittable)
+    }
+
     func testFirstLaunchCreatesBlankArtwork() {
         let app = XCUIApplication()
         app.launchArguments.append("-ui-testing")
@@ -185,5 +266,13 @@ final class FurtherUITests: XCTestCase {
         XCTAssertTrue(app.scrollViews["artwork.current"].waitForExistence(timeout: 3))
         app.buttons["artwork.settings"].tap()
         XCTAssertTrue(app.buttons["Miles"].isSelected)
+    }
+
+    private func tapWhenReachable(_ element: XCUIElement, in scrollView: XCUIElement) {
+        for _ in 0..<6 where !element.isHittable {
+            scrollView.swipeUp()
+        }
+        XCTAssertTrue(element.isHittable)
+        element.tap()
     }
 }
